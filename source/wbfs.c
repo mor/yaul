@@ -237,7 +237,7 @@ s32 WBFS_Init(u32 device, u32 timeout)
 	/* Try to mount device */
 	for (cnt = 0; cnt < timeout; cnt++) {
 		switch (device) {
-		case WBFS_DEVICE_USB: {
+		case WBFS_DEVICE_USB:
 			/* Initialize USB storage */
 			ret = USBStorage_Init();
 
@@ -251,9 +251,9 @@ s32 WBFS_Init(u32 device, u32 timeout)
 
 				goto out;
 			}
-		}
+			break;
 
-		case WBFS_DEVICE_SDHC: {
+		case WBFS_DEVICE_SDHC:
 			/* Initialize SDHC */
 			ret = SDHC_Init();
 
@@ -269,7 +269,7 @@ s32 WBFS_Init(u32 device, u32 timeout)
 				goto out;
 			} else
 				ret = -1;
-		}
+			break;
 
 		default:
 			return -1;
