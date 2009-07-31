@@ -109,17 +109,23 @@ char *__Menu_PrintTitle(char *name)
 	return name;
 }
 
-void __Menu_PrintInfo(struct discHdr *header)
+f32 __Menu_GameSize(struct discHdr *header)
 {
 	f32 size = 0.0;
-
-	/* Get game size */
 	WBFS_GameSize(header->id, &size);
+	return size;
+}
+
+void __Menu_PrintInfo(struct discHdr *header)
+{
+	//f32 size = 0.0;
+
+	///* Get game size */
+	//WBFS_GameSize(header->id, &size);
 
 	/* Print game info */
 	printf("    %s\n",                    header->title);
-	printf("    (%c%c%c%c) (%.2fGB)\n\n", header->id[0], header->id[1], header->id[2], header->id[3], size);
-}
+	printf("    (%c%c%c%c) (%.2fGB)\n\n", header->id[0], header->id[1], header->id[2], header->id[3], __Menu_GameSize(header) );}
 
 void __Menu_MoveList(s8 delta)
 {
@@ -167,6 +173,14 @@ void __Menu_ShowList(void)
 			/* Entries per page limit reached */
 			if ((cnt - gameStart) >= ENTRIES_PER_PAGE)
 				break;
+
+			if (gameSelected == cnt)
+				/* Reverse video scroll bar */
+				Con_ReverseVideo();
+			//else
+                        //        Con_NormalVideo();
+                        printf("    %s%.2fGB\n", __Menu_PrintTitle(header->title), __Menu_GameSize(header));
+                        Con_NormalVideo();
 
 			/* Print entry */
 			printf("\t%2s %s\n", (gameSelected == cnt) ? ">>" : "  ", __Menu_PrintTitle(header->title));

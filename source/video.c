@@ -57,6 +57,19 @@ void Con_BgColor(u32 color, u8 bold)
 	fflush(stdout);
 }
 
+void Con_ReverseVideo(void)
+{
+	Con_FgColor(0, 0);
+	Con_BgColor(7, 1);
+}
+
+void Con_NormalVideo(void)
+{
+	Con_FgColor(7, 1);
+	Con_BgColor(0, 0);
+	                
+}
+
 void Con_FillRow(u32 row, u32 color, u8 bold)
 {
 	s32 cols, rows;

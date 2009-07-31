@@ -96,7 +96,7 @@ s32 Apploader_Run(entry_point *entry)
 		WDVD_Read(dst, len, (u64)(offset << 2));
 
 		/* Apply Anti_002 fix as needed */
-                if (ios_revision < 12 || ios_revision > 13)
+		if (ios_revision < 12 || ios_revision > 13)
 			Apply_Anti_002_fix(dst, len);
 	}
 

@@ -9,6 +9,8 @@ void Con_Clear(void);
 void Con_ClearLine(void);
 void Con_FgColor(u32, u8);
 void Con_BgColor(u32, u8);
+void Con_ReverseVideo(void);
+void Con_NormalVideo(void);
 void Con_FillRow(u32, u32, u8);
 
 void Video_Configure(GXRModeObj *);
