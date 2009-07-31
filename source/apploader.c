@@ -55,6 +55,9 @@ s32 Apploader_Run(entry_point *entry)
 	u32 appldr_len;
 	s32 ret;
 
+	u8 ios_revision;
+	ios_revision = IOS_GetRevision();
+	
 	/* Read apploader header */
 	ret = WDVD_Read(buffer, 0x20, APPLDR_OFFSET);
 	if (ret < 0)
@@ -78,7 +81,7 @@ s32 Apploader_Run(entry_point *entry)
 	appldr_init(__noprint);
 
  	/* Remove 002 */
-                *(u32 *)0x80003140 = *(u32 *)0x80003188;
+	*(u32 *)0x80003140 = *(u32 *)0x80003188;
 
 	for (;;) {
 		void *dst = NULL;
@@ -93,7 +96,7 @@ s32 Apploader_Run(entry_point *entry)
 		WDVD_Read(dst, len, (u64)(offset << 2));
 
 		/* Apply Anti_002 fix as needed */
-                if (IOS_GetRevision() < 12 || IOS_GetRevision() > 13)
+                if (ios_revision < 12 || ios_revision > 13)
 			Apply_Anti_002_fix(dst, len);
 	}
 
