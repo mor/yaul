@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <ogcsys.h>
+#include <string.h>
 
 #include "apploader.h"
 #include "wdvd.h"
@@ -25,6 +26,24 @@ static void __noprint(const char *fmt, ...)
 {
 }
 
+/* Anti 002 fix for IOS 249 */
+void Apply_Anti_002_fix(void *Address, int Size)
+{
+        u8 SearchPattern[12] =  { 0x2C, 0x00, 0x00, 0x00, 0x48, 0x00, 0x02, 0x14, 0x3C, 0x60, 0x80, 0x00 };
+        u8 PatchData[12] =      { 0x2C, 0x00, 0x00, 0x00, 0x40, 0x82, 0x02, 0x14, 0x3C, 0x60, 0x80, 0x00 };
+
+        void *Addr = Address;
+        void *Addr_end = Address+Size;
+
+        while(Addr <= Addr_end-sizeof(SearchPattern))
+        {
+                if(memcmp(Addr, SearchPattern, sizeof(SearchPattern))==0)
+                {
+                        memcpy(Addr,PatchData,sizeof(PatchData));
+                }
+                Addr += 4;
+        }
+}
 
 s32 Apploader_Run(entry_point *entry)
 {
@@ -58,6 +77,9 @@ s32 Apploader_Run(entry_point *entry)
 	/* Initialize apploader */
 	appldr_init(__noprint);
 
+ 	/* Remove 002 */
+                *(u32 *)0x80003140 = *(u32 *)0x80003188;
+
 	for (;;) {
 		void *dst = NULL;
 		s32   len = 0, offset = 0;
@@ -69,6 +91,10 @@ s32 Apploader_Run(entry_point *entry)
 
 		/* Read data from DVD */
 		WDVD_Read(dst, len, (u64)(offset << 2));
+
+		/* Apply Anti_002 fix as needed */
+                if (IOS_GetRevision() < 12 || IOS_GetRevision() > 13)
+			Apply_Anti_002_fix(dst, len);
 	}
 
 	/* Set entry point from apploader */
