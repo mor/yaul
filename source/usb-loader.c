@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <ogcsys.h>
 
+#include "sys/stat.h"
+#include "wpad.h"
 #include "disc.h"
 #include "gui.h"
 #include "menu.h"
@@ -9,7 +11,7 @@
 #include "subsystem.h"
 #include "sys.h"
 #include "video.h"
-
+#include "config.h"
 
 int main(int argc, char **argv)
 {
@@ -49,7 +51,7 @@ int main(int argc, char **argv)
 
 		goto out;
 	}
-
+	
 	/* Menu loop */
 	Menu_Loop();
 

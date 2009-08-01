@@ -4,6 +4,7 @@
 #include <malloc.h>
 #include <ogcsys.h>
 
+#include "sys/stat.h"
 #include "disc.h"
 #include "fat.h"
 #include "gui.h"
@@ -15,10 +16,11 @@
 #include "video.h"
 #include "wbfs.h"
 #include "wpad.h"
+#include "config.h"
 
 /* Constants */
-#define ENTRIES_PER_PAGE	12
-#define MAX_CHARACTERS		30
+#define ENTRIES_PER_PAGE	10
+#define MAX_CHARACTERS		26
 
 /* Gamelist buffer */
 static struct discHdr *gameList = NULL;
@@ -94,19 +96,22 @@ err:
 char *__Menu_PrintTitle(char *name)
 {
 	static char buffer[MAX_CHARACTERS + 4];
-
-	/* Clear buffer */
-	memset(buffer, 0, sizeof(buffer));
+	
+	///* Pad buffer with spaces */
+	//memset(buffer, 0, sizeof(buffer) - 1);
 
 	/* Check string length */
 	if (strlen(name) > (MAX_CHARACTERS + 3)) {
+		memset(buffer, 0, sizeof(buffer));
 		strncpy(buffer, name,  MAX_CHARACTERS);
 		strncat(buffer, "...", 3);
-
-		return buffer;
+		strncat(buffer, " ", 1);
+	} else  {
+		memset(buffer, 32, sizeof(buffer));
+		strncpy(buffer, name,  strlen(name));
 	}
 
-	return name;
+	return buffer;
 }
 
 f32 __Menu_GameSize(struct discHdr *header)
@@ -125,7 +130,7 @@ void __Menu_PrintInfo(struct discHdr *header)
 
 	/* Print game info */
 	printf("    %s\n",                    header->title);
-	printf("    (%c%c%c%c) (%.2fGB)\n\n", header->id[0], header->id[1], header->id[2], header->id[3], __Menu_GameSize(header) );}
+	printf("    (%c%c%c%c) (%.2f gb)\n\n", header->id[0], header->id[1], header->id[2], header->id[3], __Menu_GameSize(header) );}
 
 void __Menu_MoveList(s8 delta)
 {
@@ -160,9 +165,9 @@ void __Menu_ShowList(void)
 	/* Get free space */
 	WBFS_DiskSpace(&used, &free);
 
-	printf("[+] Select the game you want to boot:\n\n");
+	printf("[+] WBFS device contains these %d games:\n\n", gameCnt);
 
-	/* No game list*/
+	/* Print out list of game titles and sizes */
 	if (gameCnt) {
 		u32 cnt;
 
@@ -174,25 +179,24 @@ void __Menu_ShowList(void)
 			if ((cnt - gameStart) >= ENTRIES_PER_PAGE)
 				break;
 
-			if (gameSelected == cnt)
-				/* Reverse video scroll bar */
-				Con_ReverseVideo();
-			//else
-                        //        Con_NormalVideo();
-                        printf("    %s%.2fGB\n", __Menu_PrintTitle(header->title), __Menu_GameSize(header));
-                        Con_NormalVideo();
+			printf(" ");
 
-			/* Print entry */
-			printf("\t%2s %s\n", (gameSelected == cnt) ? ">>" : "  ", __Menu_PrintTitle(header->title));
+			if (gameSelected == cnt)
+				/* Turn on reverse video scroll bar */
+				Con_ReverseVideo();
+
+                        printf("   %s%.2f gb\n", __Menu_PrintTitle(header->title), __Menu_GameSize(header));
+                        Con_NormalVideo();
 		}
 	} else
+		/* Unless there aren't any */
 		printf("\t>> No games found!!\n");
 
 	printf("\n\n");
 
 	/* Print free/used space */
-	printf("[+] Free space: %.2fGB\n", free);
-	printf("    Used space: %.2fGB\n", used);
+	printf("[+] Free: %.2f gb  Used: %.2f gb\n\n", free, used);
+	//printf("    Used space: %.2fGB\n", used);
 }
 
 void __Menu_ShowCover(void)
@@ -209,44 +213,111 @@ void __Menu_ShowCover(void)
 
 void __Menu_Controls(void)
 {
-	u32 buttons = Wpad_WaitButtons();
+	for (;;) 
+	{
+		u32 buttons = Wpad_WaitButtons();
 
-	/* UP/DOWN buttons */
-	if (buttons & WPAD_BUTTON_UP)
-		__Menu_MoveList(-1);
+		/* UP/DOWN buttons */
+		if (buttons & WPAD_BUTTON_UP) {
+			__Menu_MoveList(-1);
+			break;
+		}
 
-	if (buttons & WPAD_BUTTON_DOWN)
-		__Menu_MoveList(1);
+		if (buttons & WPAD_BUTTON_DOWN) {
+			__Menu_MoveList(1);
+			break;
+		}
 
-	/* LEFT/RIGHT buttons */
-	if (buttons & WPAD_BUTTON_LEFT)
-		__Menu_MoveList(-ENTRIES_PER_PAGE);
+		/* LEFT/RIGHT buttons */
+		if (buttons & WPAD_BUTTON_LEFT) {
+			__Menu_MoveList(-ENTRIES_PER_PAGE);
+			break;
+		}
 
-	if (buttons & WPAD_BUTTON_RIGHT)
-		__Menu_MoveList(ENTRIES_PER_PAGE);
+		if (buttons & WPAD_BUTTON_RIGHT) {
+			__Menu_MoveList(ENTRIES_PER_PAGE);
+			break;
+		}
 
+		/* HOME button */
+		if (buttons & WPAD_BUTTON_HOME) {
+			Restart();
+			break;
+		}
 
-	/* HOME button */
-	if (buttons & WPAD_BUTTON_HOME)
-		Restart();
+		/* PLUS (+) button */
+		if (buttons & WPAD_BUTTON_PLUS) {
+			Menu_Install();
+			break;
+		}
 
-	/* PLUS (+) button */
-	if (buttons & WPAD_BUTTON_PLUS)
-		Menu_Install();
+		/* MINUS (-) button */
+		if (buttons & WPAD_BUTTON_MINUS) {
+			Menu_Remove();
+			break;
+		}
 
-	/* MINUS (-) button */
-	if (buttons & WPAD_BUTTON_MINUS)
-		Menu_Remove();
+		/* ONE (1) button */
+		if (buttons & WPAD_BUTTON_1) {
+			Menu_Device();
+			break;
+		}
 
-	/* ONE (1) button */
-	if (buttons & WPAD_BUTTON_1)
-		Menu_Device();
-
-	/* A button */
-	if (buttons & WPAD_BUTTON_A)
-		Menu_Boot();
+		/* A button */
+		if (buttons & WPAD_BUTTON_A) {
+			Menu_Boot();
+			break;
+		}
+		//if (buttons & WPAD_BUTTON_B) {
+		//	Menu_Config();
+		//	break;
+		//}
+	}
 }
 
+void Menu_Config(void)
+{
+	struct discHdr *header = NULL;
+
+	//s32 ret;
+
+	/* No game list */
+	if (!gameCnt)
+		return;
+
+	/* Selected game */
+	header = &gameList[gameSelected];
+
+	/* Clear console */
+	Con_Clear();
+
+	//printf("[+] Are you sure you want to CONFIGURE this\n");
+	//printf("    game?\n\n");
+
+	/* Show game info */
+	__Menu_PrintInfo(header);
+
+	printf("\n  Press A button to CONFIGURE.\n");
+	printf("    Press B button to go back.\n\n");
+
+	/* Wait for user answer */
+	for (;;) {
+		u32 buttons = Wpad_WaitButtons();
+
+		/* A button */
+		if (buttons & WPAD_BUTTON_A)
+			break;
+
+		/* B button */
+		if (buttons & WPAD_BUTTON_B)
+			return;
+	}
+	
+	printf("    Configuration routine placeholder...\n\n");
+	printf("    Press any button...\n");
+	Wpad_WaitButtons();
+	
+}
 
 void Menu_Format(void)
 {
@@ -287,7 +358,7 @@ loop:
 
 		/* Valid partition */
 		if (size)
-			printf("Partition #%d: (size = %.2fGB)\n",       cnt + 1, size);
+			printf("Partition #%d: (size = %.2f gb)\n",       cnt + 1, size);
 		else 
 			printf("Partition #%d: (cannot be formatted)\n", cnt + 1);
 	}
@@ -327,7 +398,7 @@ format:
 	printf("    this partition?\n\n");
 
 	printf("    Partition #%d\n",                  selected + 1);
-	printf("    (size = %.2fGB - type: %02X)\n\n", entry->size * (sector_size / GB_SIZE), entry->type);
+	printf("    (size = %.2f gb - type: %02X)\n\n", entry->size * (sector_size / GB_SIZE), entry->type);
 
 	printf("    Press A button to continue.\n");
 	printf("    Press B button to go back.\n\n\n");
@@ -594,7 +665,7 @@ void Menu_Remove(void)
 	/* Remove game */
 	ret = WBFS_RemoveGame(header->id);
 	if (ret < 0) {
-		printf("\n    ERROR! (ret = %d)\n", ret);
+		printf("\n  ERROR! (ret = %d)\n", ret);
 		goto out;
 	} else
 		printf(" OK!\n");
