@@ -82,7 +82,8 @@ s32 Apploader_Run(entry_point *entry)
 
  	/* Remove 002 */
 	*(u32 *)0x80003140 = *(u32 *)0x80003188;
-
+	//printf("    Error 002 fix applied...\n");
+	
 	for (;;) {
 		void *dst = NULL;
 		s32   len = 0, offset = 0;
@@ -96,8 +97,9 @@ s32 Apploader_Run(entry_point *entry)
 		WDVD_Read(dst, len, (u64)(offset << 2));
 
 		/* Apply Anti_002 fix as needed */
-		if (ios_revision < 12 || ios_revision > 13)
-			Apply_Anti_002_fix(dst, len);
+		//if (ios_revision < 12 || ios_revision > 13)
+		Apply_Anti_002_fix(dst, len);
+		//printf("    Anti_002 fix applied...\n");
 	}
 
 	/* Set entry point from apploader */

@@ -5,6 +5,8 @@
 #include <fat.h>
 #include <sys/stat.h>
 
+#include "net.h"
+
 /* Constants */
 #define SDHC_MOUNT	"sdhc"
 
@@ -84,6 +86,58 @@ err:
 	/* Free memory */
 	if (buffer)
 		free(buffer);
+
+	/* Error code */
+	ret = -1;
+
+out:
+	/* Close file */
+	if (fp)
+		fclose(fp);
+
+	return ret;
+}
+
+s32 Fat_WriteFile(const char *filepath, struct block buffer)
+{
+	FILE *fp     = NULL;
+	//void *buffer = NULL;
+
+//	struct stat filestat;
+	u32         filelen = buffer.size;
+
+	s32 ret;
+
+//	/* Get filestats */
+//	stat(filepath, &filestat);
+
+	/* Get filesize */
+//	filelen = filestat.st_size;
+
+//	/* Allocate memory */
+//	buffer = memalign(32, filelen);
+//	if (!buffer)
+//		goto err;
+
+	/* Open file */
+	fp = fopen(filepath, "wb");
+	if (!fp)
+		goto err;
+
+	/* Read file */
+	ret = fwrite(buffer.data, 1, filelen, fp);
+	if (ret != filelen)
+		goto err;
+
+//	/* Set pointer */
+//	*outbuf = buffer;
+
+	goto out;
+
+err:
+//	/* Free memory */
+//	if (buffer)
+//		free(buffer);
 
 	/* Error code */
 	ret = -1;

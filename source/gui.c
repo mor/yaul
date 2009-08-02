@@ -93,7 +93,7 @@ void Gui_DrawBackground(void)
 	s32 ret;
 
 	/* Try to open background image from SD */
-	ret = Fat_ReadFile(USBLOADER_PATH "/background.png", &imgData);
+	ret = Fat_ReadFile(DATA_PATH "/background.png", &imgData);
 	if (ret > 0) {
 		u32 width, height;
 
@@ -123,7 +123,7 @@ void Gui_DrawCover(u8 *discid)
 	s32  ret;
 
 	/* Generate cover filepath */
-	sprintf(filepath, USBLOADER_PATH "/covers/%s.png", discid);
+	sprintf(filepath, COVERS_PATH "/%s.png", discid);
 
 	/* Open cover */
 	ret = Fat_ReadFile(filepath, &imgData);

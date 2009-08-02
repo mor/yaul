@@ -254,7 +254,7 @@ s32 Disc_BootPartition(u64 offset)
 	p_entry();
 
 	/* Epic failure */
-	while (1);
+	//while (1);
 
 	return 0;
 }

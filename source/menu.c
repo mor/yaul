@@ -17,10 +17,12 @@
 #include "wbfs.h"
 #include "wpad.h"
 #include "config.h"
+#include "net.h"
+#include "cover.h"
 
 /* Constants */
-#define ENTRIES_PER_PAGE	10
-#define MAX_CHARACTERS		26
+#define ENTRIES_PER_PAGE	12
+#define MAX_CHARACTERS		27
 
 /* Gamelist buffer */
 static struct discHdr *gameList = NULL;
@@ -79,7 +81,7 @@ s32 __Menu_GetEntries(void)
 	/* Set values */
 	gameList = buffer;
 	gameCnt  = cnt;
-
+ 
 	/* Reset variables */
 	gameSelected = gameStart = 0;
 
@@ -268,10 +270,10 @@ void __Menu_Controls(void)
 			Menu_Boot();
 			break;
 		}
-		//if (buttons & WPAD_BUTTON_B) {
-		//	Menu_Config();
-		//	break;
-		//}
+		if (buttons & WPAD_BUTTON_B) {
+			Menu_Config();
+			break;
+		}
 	}
 }
 
@@ -279,6 +281,8 @@ void Menu_Config(void)
 {
 	struct discHdr *header = NULL;
 
+	//struct stat filestat;
+	
 	//s32 ret;
 
 	/* No game list */
@@ -291,32 +295,59 @@ void Menu_Config(void)
 	/* Clear console */
 	Con_Clear();
 
-	//printf("[+] Are you sure you want to CONFIGURE this\n");
-	//printf("    game?\n\n");
-
 	/* Show game info */
+	printf("[+] Info/Status for:\n\n");
 	__Menu_PrintInfo(header);
-
-	printf("\n  Press A button to CONFIGURE.\n");
-	printf("    Press B button to go back.\n\n");
-
-	/* Wait for user answer */
-	for (;;) {
-		u32 buttons = Wpad_WaitButtons();
-
-		/* A button */
-		if (buttons & WPAD_BUTTON_A)
-			break;
-
-		/* B button */
-		if (buttons & WPAD_BUTTON_B)
-			return;
-	}
 	
-	printf("    Configuration routine placeholder...\n\n");
+	printf("    Have DVD box cover? ... ");
+
+	if (!Cover_Exists(header->id)) {
+		printf("NO\n\n");
+		printf("    Press A button to FETCH cover.\n");
+		printf("    Press B button to skip.\n\n");
+
+		/* Wait for user answer */
+		for (;;) {
+			u32 buttons = Wpad_WaitButtons();
+
+			/* A button */
+			if (buttons & WPAD_BUTTON_A) {
+				Cover_Fetch(header->id);
+				break;
+			}
+
+			/* B button */
+			if (buttons & WPAD_BUTTON_B)
+				return;
+		}
+	} else {
+		printf("YES\n\n");
+		printf("    Press A button to DELETE cover.\n");
+		printf("    Press B button to skip.\n\n");
+
+                /* Wait for user answer */
+                for (;;) {
+                        u32 buttons = Wpad_WaitButtons();
+
+                        /* A button */
+                        if (buttons & WPAD_BUTTON_A)
+                                break;
+
+                        /* B button */
+                        if (buttons & WPAD_BUTTON_B)
+                                return;
+                }
+
+		if ( Cover_Delete(header->id) == 0 )
+			printf("    Cover deleted!\n\n");
+		else
+			printf("    Error, unable to delete cover...\n\n");
+
+	}
+
 	printf("    Press any button...\n");
 	Wpad_WaitButtons();
-	
+	return;	
 }
 
 void Menu_Format(void)
@@ -694,33 +725,33 @@ void Menu_Boot(void)
 	/* Selected game */
 	header = &gameList[gameSelected];
 
-	/* Clear console */
-	Con_Clear();
+//	/* Clear console */
+//	Con_Clear();
 
-	printf("[+] Are you sure you want to boot this\n");
-	printf("    game?\n\n");
+//	printf("[+] Are you sure you want to boot this\n");
+//	printf("    game?\n\n");
 
-	/* Show game info */
-	__Menu_PrintInfo(header);
+//	/* Show game info */
+//	__Menu_PrintInfo(header);
 
-	printf("    Press A button to continue.\n");
-	printf("    Press B button to go back.\n\n");
+//	printf("    Press A button to continue.\n");
+//	printf("    Press B button to go back.\n\n");
 
-	/* Wait for user answer */
-	for (;;) {
-		u32 buttons = Wpad_WaitButtons();
+//	/* Wait for user answer */
+//	for (;;) {
+//		u32 buttons = Wpad_WaitButtons();
 
-		/* A button */
-		if (buttons & WPAD_BUTTON_A)
-			break;
+//		/* A button */
+//		if (buttons & WPAD_BUTTON_A)
+//			break;
 
-		/* B button */
-		if (buttons & WPAD_BUTTON_B)
-			return;
-	}
+//		/* B button */
+//		if (buttons & WPAD_BUTTON_B)
+//			return;
+//	}
 
 	printf("\n");
-	printf("[+] Booting Wii game, please wait...\n");
+	printf("[+] Booting %s, please wait...\n", header->title);
 
 	/* Set WBFS mode */
 	Disc_SetWBFS(wbfsDev, header->id);
