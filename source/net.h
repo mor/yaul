@@ -30,6 +30,7 @@ extern const struct block emptyblock;
 void Net_Init(void);
 struct block Net_GetFile(char * host, char * path);
 u32 Net_Getipbyname(char *host);
+bool Net_Is_Running(void);
 
 #ifdef __cplusplus
 }

@@ -13,6 +13,7 @@ s32 __Cover_FetchURL(char * host, char * path, u8 * discid) {
 	char cover_file[100];
 	Cover_GetFilepath(discid, cover_file);
 	
+	Con_Clear();
 	printf("[+] Trying %s...\n\n", host);
 	printf("    requesting %s.png: ", discid);
 	//char path[128];
@@ -45,11 +46,13 @@ bool Cover_Exists(u8 * discid) {
 
 s32 Cover_Fetch(u8 * discid) {
 
-        Con_Clear();
-	printf("[+] Waiting for network to initialise...\n\n");
-	
+        //Con_Clear();
+
 	/* Make sure networking is on */
-	Net_Init();
+	if (!Net_Is_Running()) {
+		printf("[+] Waiting for network to initialise...\n\n");
+		Net_Init();
+	}
 
 	s32 ret;
 
@@ -57,27 +60,27 @@ s32 Cover_Fetch(u8 * discid) {
 	char host[64];
 	u8 choice = 0;
 
-	printf("\n[+} Select cover host:\n\n");
-	printf("    Press A for %s\n", COVER_HOST_1);
-	printf("    Press B for %s\n", COVER_HOST_2);
+	//printf("\n[+} Select cover host:\n\n");
+	//printf("    Press A for %s\n", COVER_HOST_1);
+	//printf("    Press B for %s\n", COVER_HOST_2);
 
-	/* Wait for user answer */
-	for (;;) {
-		u32 buttons = Wpad_WaitButtons();
+	///* Wait for user answer */
+	//for (;;) {
+	//	u32 buttons = Wpad_WaitButtons();
 
-		/* A button */
-		if (buttons & WPAD_BUTTON_A) {
-			strcpy(host, COVER_HOST_1);
-			choice = 1;
-			break;
-		}
+	//	/* A button */
+	//	if (buttons & WPAD_BUTTON_A) {
+	//		strcpy(host, COVER_HOST_1);
+	//		choice = 1;
+	//		break;
+	//	}
 
-		/* B button */
-		if (buttons & WPAD_BUTTON_B) {
-			strcpy(host, COVER_HOST_2);
-			break;
-		}
-	}
+	//	/* B button */
+	//	if (buttons & WPAD_BUTTON_B) {
+	//		strcpy(host, COVER_HOST_2);
+	//		break;
+	//	}
+	//}
 
 	printf("\n[+] Select cover art style:\n\n");
 	printf("    Press A for 2D cover images\n");
@@ -106,7 +109,7 @@ s32 Cover_Fetch(u8 * discid) {
 		}
 	}
 
-	Con_Clear();
+	//Con_Clear();
 	ret = __Cover_FetchURL(host, path, discid);
 	return ret;
 }

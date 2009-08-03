@@ -54,33 +54,6 @@ int main(int argc, char **argv)
 		goto out;
 	}
 
-        struct stat filestat;
-
-        char data_path[100];
-        strcpy(data_path, DATA_PATH);
-        if (!stat(data_path, &filestat))
-        	printf("%s already exists!", data_path);
-	else {
-		printf("%s does not exist...", data_path);
-		printf("creating %s.", data_path);
-		mode_t mode = 0777;
-		mkdir(data_path, mode);
-	}
-
-        char cover_path[100];
-        strcpy(cover_path, COVERS_PATH);
-        if (!stat(cover_path, &filestat))
-        	printf("%s already exists!", cover_path);
-	else {
-		printf("%s does not exist...", cover_path);
-		printf("creating %s.", cover_path);
-		mode_t mode = 0777;
-		mkdir(cover_path, mode);
-	}
-
-	printf("Press any button...\n");
-	Wpad_WaitButtons();
-		
 	/* Menu loop */
 	Menu_Loop();
 

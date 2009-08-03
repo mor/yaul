@@ -8,7 +8,7 @@
 #include "net.h"
 
 /* Constants */
-#define SDHC_MOUNT	"sdhc"
+#define SDHC_MOUNT "sdhc"
 
 /* Disc interfaces */
 extern const DISC_INTERFACE __io_sdhc;
@@ -48,11 +48,11 @@ s32 Fat_UnmountSDHC(void)
 
 s32 Fat_ReadFile(const char *filepath, void **outbuf)
 {
-	FILE *fp     = NULL;
+	FILE *fp = NULL;
 	void *buffer = NULL;
 
 	struct stat filestat;
-	u32         filelen;
+	u32 filelen;
 
 	s32 ret;
 
@@ -100,26 +100,12 @@ out:
 
 s32 Fat_WriteFile(const char *filepath, struct block buffer)
 {
-	FILE *fp     = NULL;
-	//void *buffer = NULL;
-
-//	struct stat filestat;
-	u32         filelen = buffer.size;
+	FILE *fp = NULL;
+	u32 filelen = buffer.size;
 
 	s32 ret;
 
-//	/* Get filestats */
-//	stat(filepath, &filestat);
-
-	/* Get filesize */
-//	filelen = filestat.st_size;
-
-//	/* Allocate memory */
-//	buffer = memalign(32, filelen);
-//	if (!buffer)
-//		goto err;
-
-	/* Open file */
+	/* Open file for write */
 	fp = fopen(filepath, "wb");
 	if (!fp)
 		goto err;
@@ -129,16 +115,9 @@ s32 Fat_WriteFile(const char *filepath, struct block buffer)
 	if (ret != filelen)
 		goto err;
 
-//	/* Set pointer */
-//	*outbuf = buffer;
-
 	goto out;
 
 err:
-//	/* Free memory */
-//	if (buffer)
-//		free(buffer);
-
 	/* Error code */
 	ret = -1;
 

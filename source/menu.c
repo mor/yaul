@@ -3,10 +3,10 @@
 #include <string.h>
 #include <malloc.h>
 #include <ogcsys.h>
+#include <sys/stat.h>
 
-#include "sys/stat.h"
 #include "disc.h"
-#include "fat.h"
+//#include "fat.h"
 #include "gui.h"
 #include "menu.h"
 #include "partition.h"
@@ -17,12 +17,12 @@
 #include "wbfs.h"
 #include "wpad.h"
 #include "config.h"
-#include "net.h"
+//#include "net.h"
 #include "cover.h"
 
 /* Constants */
 #define ENTRIES_PER_PAGE	12
-#define MAX_CHARACTERS		27
+#define MAX_CHARACTERS		32
 
 /* Gamelist buffer */
 static struct discHdr *gameList = NULL;
@@ -132,7 +132,7 @@ void __Menu_PrintInfo(struct discHdr *header)
 
 	/* Print game info */
 	printf("    %s\n",                    header->title);
-	printf("    (%c%c%c%c) (%.2f gb)\n\n", header->id[0], header->id[1], header->id[2], header->id[3], __Menu_GameSize(header) );}
+	printf("    (%s) (%.2fg)\n\n", header->id, __Menu_GameSize(header) );}
 
 void __Menu_MoveList(s8 delta)
 {
@@ -181,13 +181,13 @@ void __Menu_ShowList(void)
 			if ((cnt - gameStart) >= ENTRIES_PER_PAGE)
 				break;
 
-			printf(" ");
+			printf("   ");
 
 			if (gameSelected == cnt)
 				/* Turn on reverse video scroll bar */
 				Con_ReverseVideo();
 
-                        printf("   %s%.2f gb\n", __Menu_PrintTitle(header->title), __Menu_GameSize(header));
+                        printf(" %s%.2fg \n", __Menu_PrintTitle(header->title), __Menu_GameSize(header));
                         Con_NormalVideo();
 		}
 	} else
@@ -197,8 +197,8 @@ void __Menu_ShowList(void)
 	printf("\n\n");
 
 	/* Print free/used space */
-	printf("[+] Free: %.2f gb  Used: %.2f gb\n\n", free, used);
-	//printf("    Used space: %.2fGB\n", used);
+	printf("[+] Free: %.2fg  Used: %.2fg\n\n", free, used);
+	//printf("    Used space: %.2fg\n", used);
 }
 
 void __Menu_ShowCover(void)
@@ -389,7 +389,7 @@ loop:
 
 		/* Valid partition */
 		if (size)
-			printf("Partition #%d: (size = %.2f gb)\n",       cnt + 1, size);
+			printf("Partition #%d: (size = %.2fg)\n",       cnt + 1, size);
 		else 
 			printf("Partition #%d: (cannot be formatted)\n", cnt + 1);
 	}
@@ -429,7 +429,7 @@ format:
 	printf("    this partition?\n\n");
 
 	printf("    Partition #%d\n",                  selected + 1);
-	printf("    (size = %.2f gb - type: %02X)\n\n", entry->size * (sector_size / GB_SIZE), entry->type);
+	printf("    (size = %.2fg - type: %02X)\n\n", entry->size * (sector_size / GB_SIZE), entry->type);
 
 	printf("    Press A button to continue.\n");
 	printf("    Press B button to go back.\n\n\n");
@@ -466,9 +466,79 @@ out:
 	Wpad_WaitButtons();
 }
 
+void Menu_Auto(void)
+{
+        u32 timeout = DEVICE_TIMEOUT;
+        s32 ret;
+        
+	//printf("[+] Mounting device, please wait...\n");
+	//printf("    (%d seconds timeout)\n\n", timeout);
+	//fflush(stdout);
+
+	printf("[+] Startup routines...\n\n");
+	printf("    Using IOS: %d, rev %d\n", IOS_GetVersion(), IOS_GetRevision());
+	printf("    SD Card mounted.\n");
+	printf("    Config directories initialized.\n");
+	printf("    Wiimote initialized.\n");
+	Net_Init();
+	printf("    Scanning for USB/WBFS device...\n\n");
+	
+	/* Initialize WBFS */
+	ret = WBFS_Init(WBFS_DEVICE_USB, timeout);
+	if (ret < 0) {
+		printf("    USB/WBFS Not Found...\n\n");
+		printf("    Press any button for device menu...\n");
+		Menu_Device();
+		//printf("    ERROR! (ret = %d)\n", ret);
+
+		/* Restart wait */
+		//Restart_Wait();
+	}
+
+	/* Try to open device */
+	if (WBFS_Open() < 0) {
+		printf("    USB/WBFS Not Found...\n\n");
+		printf("    Press any button for device menu...\n");
+		Menu_Device();
+		/* Clear console */
+
+		//Con_Clear();
+
+		//printf("[+] WARNING:\n\n");
+
+		//printf("    No WBFS partition found!\n");
+		//printf("    You need to format a partition.\n\n");
+
+		//printf("    Press A button to format a partition.\n");
+		//printf("    Press B button to restart.\n\n");
+
+		/* Wait for user answer */
+		//for (;;) {
+		//	u32 buttons = Wpad_WaitButtons();
+
+		//	/* A button */
+		//	if (buttons & WPAD_BUTTON_A)
+		//		break;
+
+			/* B button */
+		//	if (buttons & WPAD_BUTTON_B)
+		//		Restart();
+		//}
+
+		/* Format device */
+		//Menu_Format();
+	}
+
+	/* Get game list */
+	printf("    USB/WBFS Found!\n\n");
+	printf("    Please wait while games load...");
+	__Menu_GetEntries();
+}
+
+
 void Menu_Device(void)
 {
-	u32 timeout = 30;
+	u32 timeout = DEVICE_TIMEOUT;
 	s32 ret;
 
 	/* Ask user for device */
@@ -478,11 +548,11 @@ void Menu_Device(void)
 		/* Set device name */
 		switch (wbfsDev) {
 		case WBFS_DEVICE_USB:
-			devname = "USB Mass Storage Device";
+			devname = USB_DEVICE_NAME;
 			break;
 
 		case WBFS_DEVICE_SDHC:
-			devname = "SD/SDHC Card";
+			devname = SD_DEVICE_NAME;
 			break;
 		}
 
@@ -751,7 +821,7 @@ void Menu_Boot(void)
 //	}
 
 	printf("\n");
-	printf("[+] Booting %s, please wait...\n", header->title);
+	printf("[+] Booting %s", header->title);
 
 	/* Set WBFS mode */
 	Disc_SetWBFS(wbfsDev, header->id);
@@ -780,8 +850,9 @@ out:
 void Menu_Loop(void)
 {
 	/* Device menu */
-	Menu_Device();
-
+	//Menu_Device();
+	Menu_Auto();
+	
 	/* Menu loop */
 	for (;;) {
 		/* Clear console */
