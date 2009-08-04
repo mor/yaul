@@ -7,6 +7,8 @@
 
 #include "disc.h"
 //#include "fat.h"
+#include "subsystem.h"
+#include "usbstorage.h"
 #include "gui.h"
 #include "menu.h"
 #include "partition.h"
@@ -22,7 +24,7 @@
 
 /* Constants */
 #define ENTRIES_PER_PAGE	12
-#define MAX_CHARACTERS		32
+#define MAX_CHARACTERS		28
 
 /* Gamelist buffer */
 static struct discHdr *gameList = NULL;
@@ -81,10 +83,18 @@ s32 __Menu_GetEntries(void)
 	/* Set values */
 	gameList = buffer;
 	gameCnt  = cnt;
- 
+
 	/* Reset variables */
 	gameSelected = gameStart = 0;
 
+	for (cnt = gameStart; cnt < gameCnt; cnt++) {
+		struct discHdr *header = &gameList[cnt];
+		if (!Cover_Exists(header->id)) {
+			//printf("[+] Fetch cover: %s\n", header->title);
+			Cover_Fetch(header->id);
+		}
+	}
+	
 	return 0;
 
 err:
@@ -194,10 +204,8 @@ void __Menu_ShowList(void)
 		/* Unless there aren't any */
 		printf("\t>> No games found!!\n");
 
-	printf("\n\n");
-
 	/* Print free/used space */
-	printf("[+] Free: %.2fg  Used: %.2fg\n\n", free, used);
+	printf("\n[+] Free: %.2fg  Used: %.2fg\n\n", free, used);
 	//printf("    Used space: %.2fg\n", used);
 }
 
@@ -243,7 +251,10 @@ void __Menu_Controls(void)
 
 		/* HOME button */
 		if (buttons & WPAD_BUTTON_HOME) {
-			Restart();
+			//Restart();
+			Subsystem_Close();
+			USBStorage_Deinit();
+			exit (0);
 			break;
 		}
 
@@ -261,6 +272,7 @@ void __Menu_Controls(void)
 
 		/* ONE (1) button */
 		if (buttons & WPAD_BUTTON_1) {
+			USBStorage_Deinit();
 			Menu_Device();
 			break;
 		}
@@ -270,10 +282,10 @@ void __Menu_Controls(void)
 			Menu_Boot();
 			break;
 		}
-		if (buttons & WPAD_BUTTON_B) {
-			Menu_Config();
-			break;
-		}
+		//if (buttons & WPAD_BUTTON_B) {
+		//	Menu_Config();
+		//	break;
+		//}
 	}
 }
 
@@ -366,7 +378,8 @@ void Menu_Format(void)
 		printf("[+] ERROR: No partitions found! (ret = %d)\n", ret);
 
 		/* Restart */
-		Restart_Wait();
+		//Restart_Wait();
+		Menu_Device();
 	}
 
 loop:
@@ -470,63 +483,24 @@ void Menu_Auto(void)
 {
         u32 timeout = DEVICE_TIMEOUT;
         s32 ret;
-        
-	//printf("[+] Mounting device, please wait...\n");
-	//printf("    (%d seconds timeout)\n\n", timeout);
-	//fflush(stdout);
 
-	printf("[+] Startup routines...\n\n");
-	printf("    Using IOS: %d, rev %d\n", IOS_GetVersion(), IOS_GetRevision());
-	printf("    SD Card mounted.\n");
-	printf("    Config directories initialized.\n");
-	printf("    Wiimote initialized.\n");
-	Net_Init();
-	printf("    Scanning for USB/WBFS device...\n\n");
-	
+	//Con_Clear();
+	printf("[+] Scanning for USB/WBFS device...\n\n");	
 	/* Initialize WBFS */
 	ret = WBFS_Init(WBFS_DEVICE_USB, timeout);
 	if (ret < 0) {
 		printf("    USB/WBFS Not Found...\n\n");
 		printf("    Press any button for device menu...\n");
+		Wpad_WaitButtons();
 		Menu_Device();
-		//printf("    ERROR! (ret = %d)\n", ret);
-
-		/* Restart wait */
-		//Restart_Wait();
 	}
 
 	/* Try to open device */
 	if (WBFS_Open() < 0) {
 		printf("    USB/WBFS Not Found...\n\n");
 		printf("    Press any button for device menu...\n");
+		Wpad_WaitButtons();
 		Menu_Device();
-		/* Clear console */
-
-		//Con_Clear();
-
-		//printf("[+] WARNING:\n\n");
-
-		//printf("    No WBFS partition found!\n");
-		//printf("    You need to format a partition.\n\n");
-
-		//printf("    Press A button to format a partition.\n");
-		//printf("    Press B button to restart.\n\n");
-
-		/* Wait for user answer */
-		//for (;;) {
-		//	u32 buttons = Wpad_WaitButtons();
-
-		//	/* A button */
-		//	if (buttons & WPAD_BUTTON_A)
-		//		break;
-
-			/* B button */
-		//	if (buttons & WPAD_BUTTON_B)
-		//		Restart();
-		//}
-
-		/* Format device */
-		//Menu_Format();
 	}
 
 	/* Get game list */
@@ -543,17 +517,20 @@ void Menu_Device(void)
 
 	/* Ask user for device */
 	for (;;) {
+
+
 		char *devname = "Unknown!";
 
+top:
 		/* Set device name */
 		switch (wbfsDev) {
-		case WBFS_DEVICE_USB:
-			devname = USB_DEVICE_NAME;
-			break;
+			case WBFS_DEVICE_USB:
+				devname = USB_DEVICE_NAME;
+				break;
 
-		case WBFS_DEVICE_SDHC:
-			devname = SD_DEVICE_NAME;
-			break;
+			case WBFS_DEVICE_SDHC:
+				devname = SD_DEVICE_NAME;
+				break;
 		}
 
 		/* Clear console */
@@ -589,12 +566,12 @@ void Menu_Device(void)
 	/* Initialize WBFS */
 	ret = WBFS_Init(wbfsDev, timeout);
 	if (ret < 0) {
-		printf("    ERROR! (ret = %d)\n", ret);
-
-		/* Restart wait */
-		Restart_Wait();
+		printf("    ERROR! (ret = %d)\n\n", ret);
+		printf("    Press any button...\n");
+		Wpad_WaitButtons();
+		goto top;
 	}
-
+	
 	/* Try to open device */
 	while (WBFS_Open() < 0) {
 		/* Clear console */
@@ -606,27 +583,28 @@ void Menu_Device(void)
 		printf("    You need to format a partition.\n\n");
 
 		printf("    Press A button to format a partition.\n");
-		printf("    Press B button to restart.\n\n");
+		printf("    Press B button to cancel.\n\n");
 
 		/* Wait for user answer */
 		for (;;) {
 			u32 buttons = Wpad_WaitButtons();
 
 			/* A button */
-			if (buttons & WPAD_BUTTON_A)
+			if (buttons & WPAD_BUTTON_A) {
 				break;
+			}
 
 			/* B button */
-			if (buttons & WPAD_BUTTON_B)
-				Restart();
+			if (buttons & WPAD_BUTTON_B) {
+				goto top;
+			}
 		}
-
-		/* Format device */
 		Menu_Format();
 	}
 
 	/* Get game list */
 	__Menu_GetEntries();
+	
 }
 
 void Menu_Install(void)
@@ -820,7 +798,7 @@ void Menu_Boot(void)
 //			return;
 //	}
 
-	printf("\n");
+	//printf("\n");
 	printf("[+] Booting %s", header->title);
 
 	/* Set WBFS mode */

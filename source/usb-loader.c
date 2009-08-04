@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <ogcsys.h>
 #include <string.h>
-
-#include "sys/stat.h"
+#include <unistd.h>
+#include <sys/stat.h>
 
 #include "wpad.h"
 #include "disc.h"
@@ -25,8 +25,8 @@ int main(int argc, char **argv)
 	/* Initialize system */
 	Sys_Init();
 
-	/* Initialize subsystems */
-	Subsystem_Init();
+	///* Initialize subsystems */
+	//Subsystem_Init();
 
 	/* Set video mode */
 	Video_SetMode();
@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 	Gui_InitConsole();
 
 	/* Show background */
-	//Gui_DrawBackground();
+	Gui_DrawBackground();
 
 	/* Check if Custom IOS is loaded */
 	if (ret < 0) {
@@ -54,6 +54,14 @@ int main(int argc, char **argv)
 		goto out;
 	}
 
+	printf("[+] Base System Initialized\n\n");
+	printf("    IOS Version: %d rev %d\n\n", IOS_GetVersion(), IOS_GetRevision());
+
+        /* Initialize subsystems */
+        Subsystem_Init();
+
+	sleep(1);
+		
 	/* Menu loop */
 	Menu_Loop();
 

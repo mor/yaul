@@ -43,13 +43,13 @@ void Net_Init(void) {
             			printf("    net_gethostip() failed, retrying...\n");
         	} while (!ip);
         		if (ip) {
-        			printf("    Network initialized.\n    IP address: %s\n", inet_ntoa(*(struct in_addr *)&ip));
+        			//printf("    Network initialized.\n    IP address: %s\n", inet_ntoa(*(struct in_addr *)&ip));
         			Network_Running = true;
 			}
     	}
 }
 
-bool Net_Is_Running(void) { return Network_Running; }
+bool Net_IsRunning(void) { return Network_Running; }
 
 static s32 Net_Connect(u32 ip, u32 port) {
 

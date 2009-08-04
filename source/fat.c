@@ -12,7 +12,9 @@
 
 /* Disc interfaces */
 extern const DISC_INTERFACE __io_sdhc;
+static bool Fat_Mounted = false;
 
+bool Fat_IsMounted(void) { return Fat_Mounted; }
 
 s32 Fat_MountSDHC(void)
 {
@@ -27,12 +29,14 @@ s32 Fat_MountSDHC(void)
 	ret = fatMountSimple(SDHC_MOUNT, &__io_sdhc);
 	if (!ret)
 		return -2;
-
+	
+	Fat_Mounted = true;
 	return 0;
 }
 
 s32 Fat_UnmountSDHC(void)
 {
+	Fat_Mounted = false;
 	s32 ret;
 
 	/* Unmount device */
