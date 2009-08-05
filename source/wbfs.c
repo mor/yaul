@@ -4,6 +4,7 @@
 #include <ogcsys.h>
 
 #include "sdhc.h"
+#include "subsystem.h"
 #include "usbstorage.h"
 #include "utils.h"
 #include "video.h"
@@ -250,6 +251,15 @@ s32 WBFS_Init(u32 device, u32 timeout)
 				nb_sectors = USBStorage_GetCapacity(&sector_size);
 
 				goto out;
+			}else{
+				ret = -1;
+				if(cnt==0) printf("Attempt number: ");
+				printf("%d ",cnt+1);
+				Subsystem_Close();
+				WDVD_Close();
+				ret = IOS_ReloadIOS(249);  //IOS must reload before USB can be retried
+				Subsystem_Init();
+				WDVD_Init();
 			}
 			break;
 
@@ -267,12 +277,21 @@ s32 WBFS_Init(u32 device, u32 timeout)
 				sector_size = SDHC_SECTOR_SIZE;
 
 				goto out;
-			} else
-				ret = -1;
+			} else{
+                                ret = -1;
+				if(cnt==0) printf("Attempt number: ");
+                                printf("%d ",cnt);
+                                Subsystem_Close();
+				WDVD_Close();
+                                ret = IOS_ReloadIOS(249);  //IOS must reload before SD can be retried
+                                Subsystem_Init();
+				WDVD_Init();
+                        }
 			break;
 
 		default:
 			return -1;
+			break;
 		}
 
 		/* Sleep 1 second */
