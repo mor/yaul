@@ -6,7 +6,6 @@
 #include <sys/stat.h>
 
 #include "disc.h"
-//#include "fat.h"
 #include "subsystem.h"
 #include "usbstorage.h"
 #include "gui.h"
@@ -19,7 +18,6 @@
 #include "wbfs.h"
 #include "wpad.h"
 #include "config.h"
-//#include "net.h"
 #include "cover.h"
 
 /* Constants */
@@ -135,14 +133,10 @@ f32 __Menu_GameSize(struct discHdr *header)
 
 void __Menu_PrintInfo(struct discHdr *header)
 {
-	//f32 size = 0.0;
-
-	///* Get game size */
-	//WBFS_GameSize(header->id, &size);
-
 	/* Print game info */
 	printf("    %s\n",                    header->title);
-	printf("    (%s) (%.2fg)\n\n", header->id, __Menu_GameSize(header) );}
+	printf("    (%s) (%.2fg)\n\n", header->id, __Menu_GameSize(header) );
+}
 
 void __Menu_MoveList(s8 delta)
 {
@@ -251,10 +245,7 @@ void __Menu_Controls(void)
 
 		/* HOME button */
 		if (buttons & WPAD_BUTTON_HOME) {
-			//Restart();
-			Subsystem_Close();
-			USBStorage_Deinit();
-			exit (0);
+			Restart();
 			break;
 		}
 
@@ -292,10 +283,6 @@ void __Menu_Controls(void)
 void Menu_Config(void)
 {
 	struct discHdr *header = NULL;
-
-	//struct stat filestat;
-	
-	//s32 ret;
 
 	/* No game list */
 	if (!gameCnt)
@@ -540,8 +527,8 @@ top:
 		printf("    < %s >\n\n", devname);
 
 		printf("    Press LEFT/RIGHT to select device.\n");
-		printf("    Press A button to continue.\n\n");
-
+		printf("    Press A button to mount selected device.\n");
+		printf("    Press B button to quit to loader.\n\n");
 		u32 buttons = Wpad_WaitButtons();
 
 		/* LEFT/RIGHT buttons */
@@ -557,6 +544,9 @@ top:
 		/* A button */
 		if (buttons & WPAD_BUTTON_A)
 			break;
+		
+		if (buttons & WPAD_BUTTON_B)
+			Restart();		
 	}
 
 	printf("[+] Mounting device, please wait...\n");
@@ -680,7 +670,7 @@ void Menu_Install(void)
 	printf("[+] Installing game, please wait...\n\n");
 
 	printf("    %s\n",           header.title);
-	printf("    (%c%c%c%c)\n\n", header.id[0], header.id[1], header.id[2], header.id[3]);
+	printf("    (%s)\n\n", header.id);
 
 	/* Install game */
 	ret = WBFS_AddGame();
