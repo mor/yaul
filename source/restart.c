@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <ogcsys.h>
-#include <stdlib.h>
 
 #include "sys.h"
 #include "wpad.h"
-#include "subsystem.h"
-#include "usbstorage.h"
+
 
 void Restart(void)
 {
@@ -13,9 +11,7 @@ void Restart(void)
 	fflush(stdout);
 
 	/* Load system menu */
-	Subsystem_Close();
-	USBStorage_Deinit();
-	exit (0);
+	Sys_LoadMenu();
 }
 
 void Restart_Wait(void)
