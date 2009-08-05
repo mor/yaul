@@ -251,11 +251,7 @@ void __Menu_Controls(void)
 
 		/* HOME button */
 		if (buttons & WPAD_BUTTON_HOME) {
-			//Restart();
-			Subsystem_Close();
-			USBStorage_Deinit();
-			exit (0);
-			break;
+			Restart();
 		}
 
 		/* PLUS (+) button */
@@ -376,10 +372,6 @@ void Menu_Format(void)
 	ret = Partition_GetEntries(wbfsDev, partitions, &sector_size);
 	if (ret < 0) {
 		printf("[+] ERROR: No partitions found! (ret = %d)\n", ret);
-
-		/* Restart */
-		//Restart_Wait();
-		Menu_Device();
 	}
 
 loop:
@@ -540,8 +532,8 @@ top:
 		printf("    < %s >\n\n", devname);
 
 		printf("    Press LEFT/RIGHT to select device.\n");
-		printf("    Press A button to continue.\n\n");
-
+		printf("    Press A button to continue.\n");
+		printf("    Press HOME button to Quit.\n\n");
 		u32 buttons = Wpad_WaitButtons();
 
 		/* LEFT/RIGHT buttons */
@@ -557,6 +549,10 @@ top:
 		/* A button */
 		if (buttons & WPAD_BUTTON_A)
 			break;
+			
+		/* HOME button */
+		if (buttons & WPAD_BUTTON_HOME)
+			Restart();
 	}
 
 	printf("[+] Mounting device, please wait...\n");
