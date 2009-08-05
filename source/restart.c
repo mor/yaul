@@ -9,7 +9,7 @@
 
 void Restart(void)
 {
-	printf("\n    Restarting Wii...");
+	printf("    Exiting to Loader...\n");
 	fflush(stdout);
 
 	/* Load system menu */

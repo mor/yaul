@@ -491,8 +491,8 @@ void Menu_Auto(void)
 	}
 
 	/* Get game list */
-	printf("    USB/WBFS Found!\n\n");
-	printf("    Please wait while games load...");
+	printf("    USB/WBFS Found!\n");
+	printf("    Please wait while games load...\n");
 	__Menu_GetEntries();
 }
 
