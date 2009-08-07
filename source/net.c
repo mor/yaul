@@ -57,6 +57,7 @@ static s32 Net_Connect(u32 ip, u32 port) {
 	s32 connection = net_socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
 	
 	if (connection < 0)
+		printf("net_socket(AF_INET, SOCK_STREAM, IPPROTO_IP) FAIL\n");
 		return connection;
 
 	/* Config socket */
@@ -150,6 +151,9 @@ struct block Net_GetFile(char * host, char * path)
         
         u32 ip = Net_Getipbyname(host);
 
+        if (ip == 0)
+        	printf("    FAILED TO OBTAIN REMOTE HOST IP\n");
+        	
 	s32 connection = Net_Connect(ip, 80);
 
 	if(connection < 0) {

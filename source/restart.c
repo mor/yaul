@@ -6,10 +6,12 @@
 #include "wpad.h"
 #include "subsystem.h"
 #include "usbstorage.h"
+#include "video.h"
 
 void Restart(void)
 {
-	printf("    Exiting to Loader...\n");
+        Con_NextToLastLine();
+	printf("[+] Exiting to Loader...\n");
 	fflush(stdout);
 
 	/* Load system menu */

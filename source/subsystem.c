@@ -2,38 +2,43 @@
 #include <ogcsys.h>
 #include <sys/stat.h>
 
+#include "subsystem.h"
 #include "fat.h"
 #include "wpad.h"
 #include "config.h"
 #include "restart.h"
 #include "net.h"
 
-void Subsystem_Init(void)
+void Subsystem_Init(u8 method)
 {
-	printf("[+] Initializing Subsystems\n\n");
+	if (method == VERBOSE) printf("[+] Initializing Subsystems\n\n");
 		
 	/* Initialize Wiimote subsystem */
-	printf("    Initializing Wiimote: ");
+	if (method == VERBOSE) printf("    Initializing Wiimote: ");
 	if (Wpad_Init()) {
-		printf("FAIL\n\n");
-		printf("    Will have to exit, sorry...\n");
+		if (method == VERBOSE) {
+			printf("FAIL\n\n");
+			printf("    Will have to exit, sorry...\n");
+		}
 		sleep(3);
 		Restart();
 	} else
-		printf("OK!\n");
+		if (method == VERBOSE) printf("OK!\n");
 
 	/* Mount SDHC */
-	printf("    Initializing SD Card: ");
+	if (method == VERBOSE) printf("    Initializing SD Card: ");
 	Fat_MountSDHC();
 	if (!Fat_IsMounted()) {
-		printf("FAIL\n");
-		printf("    * Unable to use game covers.\n");
-		printf("    Press any button...\n");
+		if (method == VERBOSE) {
+			printf("FAIL\n");
+			printf("    * Unable to use game covers.\n");
+			printf("    Press any button...\n");
+		}
 	} else {
-		printf("OK!\n");
+		if (method == VERBOSE) printf("OK!\n");
 
 		/* Create data directories if needed */
-		printf("    Initializing Cover Directories: ");
+		if (method == VERBOSE) printf("    Initializing Cover Directories: ");
 	        struct stat filestat;
 	        char data_path[100];
 	        strcpy(data_path, DATA_PATH);
@@ -50,23 +55,27 @@ void Subsystem_Init(void)
 		}
 	
 		if (stat(data_path, &filestat) || stat(cover_path, &filestat)) {
-			printf("FAIL\n");
-			printf("    * Unable to use game  covers.\n");
+			if (method == VERBOSE) {
+				printf("FAIL\n");
+				printf("    * Unable to use game  covers.\n");
+			}
 			Fat_UnmountSDHC();
 		} else
-			printf("OK!\n");
+			if (method == VERBOSE) printf("OK!\n");
 	}
 	
 	/* Initialize Network */
-	printf("    Initializing Newtwork: ");
+	if (method == VERBOSE) printf("    Initializing Newtwork: ");
 	Net_Init();
 	if (!Net_IsRunning()) {
-		printf("FAIL\n");
-		printf("    * Unable to download covers.\n\n");
+		if (method == VERBOSE) {
+			printf("FAIL\n");
+			printf("    * Unable to download covers.\n\n");
+		}
 	} else
-		printf("OK!\n\n");
+		if (method == VERBOSE) printf("OK!\n\n");
 	
-	printf("[+] Subsystems Initialized\n\n");
+	if (method == VERBOSE) printf("[+] Subsystems Initialized\n\n");
 	                
 }
 

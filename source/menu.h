@@ -8,7 +8,7 @@ void Menu_Install(void);
 void Menu_Remove(void);
 void Menu_Boot(void);
 void Menu_Config(void);
-
+void Menu_Update(void);
 void Menu_Loop(void);
 
 #endif

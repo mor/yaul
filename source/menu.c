@@ -19,6 +19,7 @@
 #include "wpad.h"
 #include "config.h"
 #include "cover.h"
+#include "update.h"
 
 /* Constants */
 #define ENTRIES_PER_PAGE	12
@@ -28,7 +29,8 @@
 static struct discHdr *gameList = NULL;
 
 /* Gamelist variables */
-static s32 gameCnt = 0, gameSelected = 0, gameStart = 0;
+static s32 gameCnt = 0, gameSelected = 0, gameStart = 0, selectedCnt = 0;
+static bool scrollFlag = true;
 
 /* WBFS device */
 static s32 wbfsDev = WBFS_MIN_DEVICE;
@@ -106,9 +108,9 @@ err:
 char *__Menu_PrintTitle(char *name)
 {
 	static char buffer[MAX_CHARACTERS + 4];
-	
+
 	///* Pad buffer with spaces */
-	//memset(buffer, 0, sizeof(buffer) - 1);
+	//memset(buffer, 32, sizeof(buffer));
 
 	/* Check string length */
 	if (strlen(name) > (MAX_CHARACTERS + 3)) {
@@ -118,7 +120,7 @@ char *__Menu_PrintTitle(char *name)
 		strncat(buffer, " ", 1);
 	} else  {
 		memset(buffer, 32, sizeof(buffer));
-		strncpy(buffer, name,  strlen(name));
+		strncpy(buffer, name, strlen(name));
 	}
 
 	return buffer;
@@ -158,10 +160,51 @@ void __Menu_MoveList(s8 delta)
 	/* List scrolling */
 	index = (gameSelected - gameStart);
 
-	if (index >= ENTRIES_PER_PAGE)
+	if (index >= ENTRIES_PER_PAGE) {
 		gameStart += index - (ENTRIES_PER_PAGE - 1);
-	if (index <= -1)
+		scrollFlag = true;
+	}
+	
+	if (index <= -1) {
 		gameStart += index;
+		scrollFlag = true;
+	}
+
+	if (!scrollFlag && (delta == 1 || delta == -1) ) {
+	        /* Move to previously 'selected' row */
+        	printf("\x1b[u");
+        	fflush(stdout);
+
+		/* Retrieve title/size of previously 'selected' game */
+		struct discHdr *header = &gameList[selectedCnt];
+		printf(" %s%.2fg ", __Menu_PrintTitle(header->title), __Menu_GameSize(header));
+
+		/* Change to new row */
+		if (delta == 1) {
+			printf("\n");
+			printf("   ");
+		}
+		else {
+			printf("\x1b[u"); //restore curs again
+			fflush(stdout);
+			printf("\x1b[1A"); //nudge it to the line above
+	                fflush(stdout);
+		}
+		
+		/* Retrieve title/size of new game */
+		selectedCnt += delta;
+		header = &gameList[selectedCnt];
+		
+		///printf("   ");
+		
+		/* Save current cursor posn */
+		printf("\x1b[s");
+		fflush(stdout);
+		/* Print it reverse */
+		Con_ReverseVideo();
+                printf(" %s%.2fg ", __Menu_PrintTitle(header->title), __Menu_GameSize(header));
+                Con_NormalVideo();
+	}	
 }
 
 void __Menu_ShowList(void)
@@ -187,10 +230,15 @@ void __Menu_ShowList(void)
 
 			printf("   ");
 
-			if (gameSelected == cnt)
+			if (gameSelected == cnt) {
+				/* Save selected game index */
+				selectedCnt = cnt;
+				/* Save current cursor posn */
+				printf("\x1b[s");
+				fflush(stdout);
 				/* Turn on reverse video scroll bar */
 				Con_ReverseVideo();
-
+			}
                         printf(" %s%.2fg \n", __Menu_PrintTitle(header->title), __Menu_GameSize(header));
                         Con_NormalVideo();
 		}
@@ -200,7 +248,8 @@ void __Menu_ShowList(void)
 
 	/* Print free/used space */
 	printf("\n[+] Free: %.2fg  Used: %.2fg\n\n", free, used);
-	//printf("    Used space: %.2fg\n", used);
+	
+	scrollFlag = false;
 }
 
 void __Menu_ShowCover(void)
@@ -277,9 +326,49 @@ void __Menu_Controls(void)
 		//	Menu_Config();
 		//	break;
 		//}
+		
+		if (buttons & WPAD_BUTTON_2) {
+			Menu_Update();
+			break;
+		}
 	}
 }
 
+void Menu_Update(void)
+{
+	Con_Clear();
+	
+	printf("[+] Check for System Update\n\n");
+	printf("    Press A to Update\n");
+	printf("    Press B to Cancel\n");
+	
+	/* Wait for user answer */
+	for (;;) {
+		u32 buttons = Wpad_WaitButtons();
+ 
+		/* A button */
+		if (buttons & WPAD_BUTTON_A) {
+			s32 ret;
+			ret = Update_Fetch();
+			if (ret == -1)
+				printf("    UPDATE FAILED!\n\n");
+			else {
+				printf("    Update Succeeded!\n\n");
+				printf("    You need to restart...\n");
+				Restart_Wait();
+			}
+			break;
+		}
+
+		/* B button */
+		if (buttons & WPAD_BUTTON_B)
+			break;
+	}
+	printf("    Press any button...\n");
+	scrollFlag = true;
+	Wpad_WaitButtons();
+}
+	
 void Menu_Config(void)
 {
 	struct discHdr *header = NULL;
@@ -324,18 +413,18 @@ void Menu_Config(void)
 		printf("    Press A button to DELETE cover.\n");
 		printf("    Press B button to skip.\n\n");
 
-                /* Wait for user answer */
-                for (;;) {
-                        u32 buttons = Wpad_WaitButtons();
+		/* Wait for user answer */
+		for (;;) {
+			u32 buttons = Wpad_WaitButtons();
 
-                        /* A button */
-                        if (buttons & WPAD_BUTTON_A)
-                                break;
+			/* A button */
+			if (buttons & WPAD_BUTTON_A)
+				break;
 
-                        /* B button */
-                        if (buttons & WPAD_BUTTON_B)
-                                return;
-                }
+			/* B button */
+			if (buttons & WPAD_BUTTON_B)
+				return;
+		}
 
 		if ( Cover_Delete(header->id) == 0 )
 			printf("    Cover deleted!\n\n");
@@ -468,8 +557,8 @@ out:
 
 void Menu_Auto(void)
 {
-        u32 timeout = DEVICE_TIMEOUT;
-        s32 ret;
+	u32 timeout = DEVICE_TIMEOUT;
+	s32 ret;
 
 	//Con_Clear();
 	printf("[+] Scanning for USB/WBFS device...\n\n");	
@@ -484,7 +573,7 @@ void Menu_Auto(void)
 
 	/* Try to open device */
 	if (WBFS_Open() < 0) {
-		printf("    USB/WBFS Not Found...\n\n");
+		printf("    USB/WBFS Found, but failed to open...\n\n");
 		printf("    Press any button for device menu...\n");
 		Wpad_WaitButtons();
 		Menu_Device();
@@ -789,7 +878,8 @@ void Menu_Boot(void)
 //	}
 
 	//printf("\n");
-	printf("[+] Booting %s", header->title);
+	Con_NextToLastLine();
+	printf("[+] Run: %s", header->title);
 
 	/* Set WBFS mode */
 	Disc_SetWBFS(wbfsDev, header->id);
@@ -824,10 +914,13 @@ void Menu_Loop(void)
 	/* Menu loop */
 	for (;;) {
 		/* Clear console */
-		Con_Clear();
+		//Con_Clear();
 
 		/* Show gamelist */
-		__Menu_ShowList();
+		if (scrollFlag) {
+			Con_Clear();
+			__Menu_ShowList();
+		}
 
 		/* Show cover */
 		__Menu_ShowCover();

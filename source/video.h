@@ -12,6 +12,8 @@ void Con_BgColor(u32, u8);
 void Con_ReverseVideo(void);
 void Con_NormalVideo(void);
 void Con_FillRow(u32, u32, u8);
+void Con_LastLine(void);
+void Con_NextToLastLine(void);
 
 void Video_Configure(GXRModeObj *);
 void Video_SetMode(void);

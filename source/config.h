@@ -33,4 +33,9 @@
 #define COVER_HOST_2_2D_PATH "/wii_2D_cover_images/%s.png"
 #define COVER_HOST_2_3D_PATH "/wii_3D_box_images/%s.png"
 
+#define UPDATE_HOST "saratoga.ath.cx"
+#define UPDATE_PATH "/downloads/latest_version/sd-usb-loader.dol"
+
+#define APP_FILE "sdhc:/apps/usb_loader/boot.dol"
+
 #endif

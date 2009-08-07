@@ -253,12 +253,10 @@ s32 WBFS_Init(u32 device, u32 timeout)
 				goto out;
 			}else{
 				ret = -1;
-				if(cnt==0) printf("Attempt number: ");
-				printf("%d ",cnt+1);
 				Subsystem_Close();
 				WDVD_Close();
 				ret = IOS_ReloadIOS(249);  //IOS must reload before USB can be retried
-				Subsystem_Init();
+				Subsystem_Init(QUIET);
 				WDVD_Init();
 			}
 			break;
@@ -279,12 +277,10 @@ s32 WBFS_Init(u32 device, u32 timeout)
 				goto out;
 			} else{
                                 ret = -1;
-				if(cnt==0) printf("Attempt number: ");
-                                printf("%d ",cnt);
                                 Subsystem_Close();
 				WDVD_Close();
                                 ret = IOS_ReloadIOS(249);  //IOS must reload before SD can be retried
-                                Subsystem_Init();
+                                Subsystem_Init(QUIET);
 				WDVD_Init();
                         }
 			break;

@@ -70,6 +70,33 @@ void Con_NormalVideo(void)
 	                
 }
 
+void Con_LastLine(void)
+{
+	s32 cols, rows;
+
+        /* Get console metrics */
+        CON_GetMetrics(&cols, &rows);
+
+	
+	/* Move to last line of screen */
+	printf("\x1b[%u;0H", rows - 1);
+	fflush(stdout);
+}
+
+/* Sometimes more convenient to move to the 
+   second line up from bottom in case you print
+   something that wraps and you don't want the 
+   screen to scroll up a line */
+void Con_NextToLastLine(void)
+{
+	Con_LastLine();
+
+	/* Move up one line */
+	printf("\x1b[1A");
+	fflush(stdout);
+}
+
+
 void Con_FillRow(u32 row, u32 color, u8 bold)
 {
 	s32 cols, rows;

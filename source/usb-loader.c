@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 	printf("    IOS Version: %d rev %d\n\n", IOS_GetVersion(), IOS_GetRevision());
 
         /* Initialize subsystems */
-        Subsystem_Init();
+        Subsystem_Init(VERBOSE);
 
 	sleep(1);
 		
