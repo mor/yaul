@@ -1,0 +1,76 @@
+[+] yaul - Yet Another USB Loader
+    Produced by xmor61, forked from Waninkoko's SD/USB Loader
+    July 30, 2009
+
+
+[+] What _exactly_ is it?
+
+yaul is a program for the Nintendo Wii that lets you backup your game
+DVDs to a USB device. It also presents a menu of all your backed up games
+so you can launch them off the drive.  Thus you can put your original
+disks away to preserve them, and speed up game loading.  yaul is based
+on Waninkoko's sd-usb-loader, and also uses snippets from other open
+source Wii software (see below).
+
+
+[+] How do I get it?
+
+yaul is open-source software under the GNU GPL. The latest source and
+binary files are available at my github repository, found here:
+
+Anyone interested in contributing code to yaul is invited to participate
+via the git verstion control system. Instructions are at the github site
+linked above.
+
+
+[+] What do I need to run it?
+
+yaul is homebrew and so, you'll need to install the Homebrew Channel or
+figure some other way to run homebrew apps. Click on the links to the left
+for more info on Wii hacking.
+
+Your Wii will need cIOS36, rev 10 or higher installed in order to run
+yaul. I recommend the latest cIOS from Waninkoko, cIOS38 rev 14, as that's
+what I use on my Wii to test yaul with, and it works well for me. You will
+need to have devkitPro installed to compile it, in case you're interested.
+
+Of course, you'll also need a hard drive connected to your Wii via the USB
+port. yaul will format your drive the first time you plug it in. You
+should also have networking configured and working on your Wii if you want
+yaul to show you box art on it's menus.
+
+
+[+] What else should I know?
+
+    * yaul is free software, IT COMES WITH NO WARRANTY.  USE IT AT YOUR
+      OWN RISK!
+
+    * yaul may be freely re-distributed and modified and incorporated into
+      new projects, as long as no effort is made to prevent future
+      versions/modifications from being distributed with these same rights.
+      View the GNU GPL, found in the accompanying LICENSE file, for more.
+      detailed info.  Basically, what it all means is that, even if you
+      sell software derived from yaul, which you may do, you must sell
+      the full source code and the right for the purchaser to modify and
+      re-distribute his own derived works, just like you did.
+
+    * yaul contains code from the following open source projects:
+
+          o Basic project fork from "SD/USB Loader" at:
+
+              http://www.teknoconsolas.es/blog/waninkoko/sdusb-loader-v15
+
+          o Networking code snippets from "ftpii" at:
+
+              http://code.google.com/p/ftpii/	
+		
+          o Game patching code snippets from USB Loader GX at:
+
+              http://code.google.com/p/usbloader-gui/
+
+      Many thanks to all the talented and generous coders at the above
+      projects, who made yaul possible.
+
+    * Contact me by sending email to:
+
+        xmor61 at users dot sourceforge dot net
