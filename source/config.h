@@ -23,7 +23,7 @@
 #define DATA_PATH "sdhc:/usb-loader"
 #define COVERS_PATH DATA_PATH "/covers"
 
-// Allow for two different cover file hosts on the internet
+// Allow for three different cover file hosts on the internet
 //  in the 2D and 3D PATH strings, %s get replaced with header->id
 #define COVER_HOST_1 "wiicover.gateflorida.com"
 #define COVER_HOST_1_2D_PATH "/sites/default/files/cover/2D%%20Cover/%s.png"
@@ -38,9 +38,9 @@
 #define COVER_HOST_3_3D_PATH "/3dBoxArt176x248/%s.png"
  
 #define UPDATE_HOST "saratoga.ath.cx"
-#define UPDATE_DOL_PATH "/downloads/latest_version/yaul.dol"
-#define UPDATE_XML_PATH "/downloads/latest_version/meta.xml"
-#define UPDATE_PNG_PATH "/downloads/latest_version/icon.png"
+#define UPDATE_DOL_PATH "/latest_version/yaul.dol"
+#define UPDATE_XML_PATH "/latest_version/meta.xml"
+#define UPDATE_PNG_PATH "/latest_version/icon.png"
 
 #define DOL_FILE "sdhc:/apps/yaul/boot.dol"
 #define XML_FILE "sdhc:/apps/yaul/meta.xml"

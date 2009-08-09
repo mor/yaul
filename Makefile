@@ -15,7 +15,7 @@ include $(DEVKITPPC)/wii_rules
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 #---------------------------------------------------------------------------------
-TARGET		:=	apps/yaul/yaul
+TARGET		:=	apps/yaul/boot
 #TARGET_DIR	:=	$(CURDIR)/apps/yaul
 BUILD		:=	build
 SOURCES		:=	source source/libpng/pngu source/libwbfs source/network
@@ -34,7 +34,7 @@ LDFLAGS	=	$(MACHDEP) -Wl,-Map,$(notdir $@).map,--section-start,.init=0x80a00100
 #---------------------------------------------------------------------------------
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
-LIBS	:=	-lasnd -lfat -lpng -lwiiuse -lbte -logc -lm -lz -ljpeg
+LIBS	:=	-lfat -lpng -lwiiuse -lbte -logc -lm -lz
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
@@ -50,7 +50,7 @@ ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
 #export OUTPUT	:=	$(CURDIR)/$(TARGET)
-export OUTPUT  :=      $(TARGET_DIR)/$(TARGET)
+export OUTPUT   :=      $(TARGET)
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(DATA),$(CURDIR)/$(dir))
 

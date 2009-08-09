@@ -18,6 +18,12 @@ source Wii software (see below).
 yaul is open-source software under the GNU GPL. The latest source and
 binary files are available at my github repository, found here:
 
+	http://github.com/mor/yaul/tree/yaul
+
+Or you can get an HBC ready binary package at my homepage, here:
+
+	http://saratoga.ath.cx
+
 Anyone interested in contributing code to yaul is invited to participate
 via the git verstion control system. Instructions are at the github site
 linked above.
@@ -46,13 +52,9 @@ yaul to show you box art on it's menus.
       OWN RISK!
 
     * yaul may be freely re-distributed and modified and incorporated into
-      new projects, as long as no effort is made to prevent future
-      versions/modifications from being distributed with these same rights.
-      View the GNU GPL, found in the accompanying LICENSE file, for more.
-      detailed info.  Basically, what it all means is that, even if you
-      sell software derived from yaul, which you may do, you must sell
-      the full source code and the right for the purchaser to modify and
-      re-distribute his own derived works, just like you did.
+      new projects, as long as all future versions/modifications are
+      distributed with these same rights.  View the GNU GPL, found in the
+      accompanying LICENSE file, for more detailed info.
 
     * yaul contains code from the following open source projects:
 
@@ -64,7 +66,7 @@ yaul to show you box art on it's menus.
 
               http://code.google.com/p/ftpii/	
 		
-          o Game patching code snippets from USB Loader GX at:
+          o Game patching & networking code snippets from USB Loader GX at:
 
               http://code.google.com/p/usbloader-gui/
 
