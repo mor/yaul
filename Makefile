@@ -15,7 +15,8 @@ include $(DEVKITPPC)/wii_rules
 # SOURCES is a list of directories containing source code
 # INCLUDES is a list of directories containing extra header files
 #---------------------------------------------------------------------------------
-TARGET		:=	yaul
+TARGET		:=	apps/yaul/yaul
+#TARGET_DIR	:=	$(CURDIR)/apps/yaul
 BUILD		:=	build
 SOURCES		:=	source source/libpng/pngu source/libwbfs source/network
 DATA		:=	data  
@@ -48,8 +49,8 @@ LIBDIRS	:=	$(DEVKITPPC)/lib $(CURDIR)
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
-export OUTPUT	:=	$(CURDIR)/$(TARGET)
-
+#export OUTPUT	:=	$(CURDIR)/$(TARGET)
+export OUTPUT  :=      $(TARGET_DIR)/$(TARGET)
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 					$(foreach dir,$(DATA),$(CURDIR)/$(dir))
 

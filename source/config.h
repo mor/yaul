@@ -38,8 +38,12 @@
 #define COVER_HOST_3_3D_PATH "/3dBoxArt176x248/%s.png"
  
 #define UPDATE_HOST "saratoga.ath.cx"
-#define UPDATE_PATH "/downloads/latest_version/sd-usb-loader.dol"
+#define UPDATE_DOL_PATH "/downloads/latest_version/yaul.dol"
+#define UPDATE_XML_PATH "/downloads/latest_version/meta.xml"
+#define UPDATE_PNG_PATH "/downloads/latest_version/icon.png"
 
-#define APP_FILE "sdhc:/apps/usb_loader/boot.dol"
+#define DOL_FILE "sdhc:/apps/yaul/boot.dol"
+#define XML_FILE "sdhc:/apps/yaul/meta.xml"
+#define PNG_FILE "sdhc:/apps/yaul/icon.png"
 
 #endif

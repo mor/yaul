@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="0.1">
+	<name>yaul</name>
+	<version></version>
+        <release_date>20090809</release_date>
+	<coder>xmor61</coder>
+	<short_description>Yet Another USB Loader</short_description>
+	<long_description>
+	yaul lets you backup your
+	game disks to a USB device. It also presents a menu of all your
+	backed up games so you can launch them off the drive. It's based on
+	Waninkoko's sd-usb-loader, and also uses snippets from other open
+	source Wii software.  Thanks to all the fabulously talented and
+	generous programmers working on Wii Homebrew!
+	</long_description>
+</app>
