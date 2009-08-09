@@ -60,7 +60,7 @@ int main(int argc, char **argv)
         /* Initialize subsystems */
         Subsystem_Init(VERBOSE);
 
-	sleep(1);
+	//sleep(1);
 		
 	/* Menu loop */
 	Menu_Loop();

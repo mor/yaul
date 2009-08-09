@@ -9,7 +9,9 @@ void Menu_Remove(void);
 void Menu_Boot(void);
 void Menu_Config(void);
 void Menu_Update(void);
+void Menu_CoverFetch(void);
 void Menu_Loop(void);
+void __Menu_PrintInfo(struct discHdr *header);
 
 #endif
 

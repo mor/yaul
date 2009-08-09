@@ -7,17 +7,19 @@ void Cover_GetFilepath(u8 * discid, char * cover_file) {
 
 s32 __Cover_FetchURL(char * host, char * path, u8 * discid) {
 
-	s32 ret = -1;
+	s32 ret;
 
 	char cover_file[100];
 	Cover_GetFilepath(discid, cover_file);
-	
+
 	struct block png_data = Net_GetFile(host, path);
 	if (png_data.size > 0) {
 		ret = Fat_WriteFile(cover_file, png_data);
-		if (ret != -1)
+		if (ret == -1)
 			ret = 0;
-	}		
+	} else
+		ret = -1;
+	
         return ret;
 }			
 
@@ -29,24 +31,31 @@ bool Cover_Exists(u8 * discid) {
 }
 
 s32 Cover_Fetch(u8 * discid) {
-
-	/* Make sure networking is on */
-	if (!Net_IsRunning())
-		Net_Init();
-
 	s32 ret;
 
 	char path[128];
+	memset(path, 0, 128);
 	char host[64];
-
+	memset(host, 0, 64);
 	strcpy(host, COVER_HOST_1);
 	sprintf(path,  COVER_HOST_1_2D_PATH, discid);
-
+	
 	ret = __Cover_FetchURL(host, path, discid);
-	if (ret == -1) {
+	if (ret <= 0) {
+		//printf("%d ", ret);
 		strcpy(host, COVER_HOST_2);
 		sprintf(path,  COVER_HOST_2_2D_PATH, discid);
+
 		ret = __Cover_FetchURL(host, path, discid);
+		if (ret <= 0) {
+			//printf("%d ", ret);
+			strcpy(host, COVER_HOST_3);
+			sprintf(path,  COVER_HOST_3_2D_PATH, discid);
+
+			ret = __Cover_FetchURL(host, path, discid);
+			//if (ret <= 0)
+				//printf("%d ", ret);
+		}
 	}
 	
 	return ret;

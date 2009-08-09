@@ -22,7 +22,7 @@ extern "C"
 struct block
 {
 	u32 size;
-	unsigned char *data;
+	unsigned char * data;
 };
 
 extern const struct block emptyblock;
@@ -30,7 +30,7 @@ extern const struct block emptyblock;
 void Net_Init(void);
 struct block Net_GetFile(char * host, char * path);
 u32 Net_Getipbyname(char *host);
-bool Net_IsRunning(void);
+u32 Net_GetIP(char * host);
 
 #ifdef __cplusplus
 }

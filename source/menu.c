@@ -30,6 +30,7 @@ static struct discHdr *gameList = NULL;
 
 /* Gamelist variables */
 static s32 gameCnt = 0, gameSelected = 0, gameStart = 0, selectedCnt = 0;
+
 static bool scrollFlag = true;
 
 /* WBFS device */
@@ -87,14 +88,6 @@ s32 __Menu_GetEntries(void)
 	/* Reset variables */
 	gameSelected = gameStart = 0;
 
-	for (cnt = gameStart; cnt < gameCnt; cnt++) {
-		struct discHdr *header = &gameList[cnt];
-		if (!Cover_Exists(header->id)) {
-			//printf("[+] Fetch cover: %s\n", header->title);
-			Cover_Fetch(header->id);
-		}
-	}
-	
 	return 0;
 
 err:
@@ -105,6 +98,63 @@ err:
 	return ret;
 }
 
+
+void Menu_CoverFetch(void) {
+	
+	scrollFlag = true;
+	
+	Con_Clear();
+
+	u16 coverCnt = 0, cnt;	
+	for (cnt = gameStart; cnt < gameCnt; cnt++) {   
+                struct discHdr *header = &gameList[cnt];
+                if (Cover_Exists(header->id)) 
+			coverCnt++;
+	}
+	
+	printf("[+] Games: %d  Covers: %d\n\n", gameCnt, coverCnt);
+	if (gameCnt == coverCnt) {
+		printf("    You have all game covers.\n\n");
+		printf("    Press any button...\n");
+		Wpad_WaitButtons();
+	} else {
+		printf("    Press A to download missing %d covers.\n", gameCnt - coverCnt);
+		printf("    Press B to skip cover downloading.\n");
+
+                /* Wait for user answer */
+                for (;;) {
+                        u32 buttons = Wpad_WaitButtons();
+
+                        /* A button */
+                        if (buttons & WPAD_BUTTON_A) {
+                                for (cnt = gameStart; cnt < gameCnt; cnt++) {
+					struct discHdr *header = &gameList[cnt];
+					if (!Cover_Exists(header->id)) {
+						__Menu_PrintInfo(header);
+						s32 bytes = Cover_Fetch(header->id);
+						if (bytes > 0)
+							printf(" : OK!\n\n");
+						if (bytes ==  0)
+							printf(" : FAIL on Net_GetFile()\n\n");
+						if (bytes < 0)
+							printf(" : FAIL on Fat_WriteFile()\n\n");
+						sleep(1);
+					}
+				}
+				printf("    Cover download complete.\n\n");
+				printf("    Press any button...");
+				Wpad_WaitButtons();
+                                break;
+                        }
+
+                        /* B button */
+                        if (buttons & WPAD_BUTTON_B)
+                                break;
+                }
+	}
+}		
+
+	
 char *__Menu_PrintTitle(char *name)
 {
 	static char buffer[MAX_CHARACTERS + 4];
@@ -136,8 +186,8 @@ f32 __Menu_GameSize(struct discHdr *header)
 void __Menu_PrintInfo(struct discHdr *header)
 {
 	/* Print game info */
-	printf("    %s\n",                    header->title);
-	printf("    (%s) (%.2fg)\n\n", header->id, __Menu_GameSize(header) );
+	printf("    %s\n", header->title);
+	printf("    (%s) (%.2fg)", header->id, __Menu_GameSize(header) );
 }
 
 void __Menu_MoveList(s8 delta)
@@ -164,7 +214,7 @@ void __Menu_MoveList(s8 delta)
 		gameStart += index - (ENTRIES_PER_PAGE - 1);
 		scrollFlag = true;
 	}
-	
+
 	if (index <= -1) {
 		gameStart += index;
 		scrollFlag = true;
@@ -268,7 +318,7 @@ void __Menu_Controls(void)
 {
 	for (;;) 
 	{
-		u32 buttons = Wpad_WaitButtons();
+		u32 buttons = Wpad_GetButtons();
 
 		/* UP/DOWN buttons */
 		if (buttons & WPAD_BUTTON_UP) {
@@ -322,12 +372,13 @@ void __Menu_Controls(void)
 			Menu_Boot();
 			break;
 		}
-		//if (buttons & WPAD_BUTTON_B) {
-		//	Menu_Config();
-		//	break;
-		//}
+		if (buttons & WPAD_BUTTON_B) {
+			Menu_Config();
+			break;
+		}
 		
 		if (buttons & WPAD_BUTTON_2) {
+			Menu_CoverFetch();
 			Menu_Update();
 			break;
 		}
@@ -336,6 +387,8 @@ void __Menu_Controls(void)
 
 void Menu_Update(void)
 {
+	scrollFlag = true;
+
 	Con_Clear();
 	
 	printf("[+] Check for System Update\n\n");
@@ -371,6 +424,8 @@ void Menu_Update(void)
 	
 void Menu_Config(void)
 {
+	scrollFlag = true;
+	
 	struct discHdr *header = NULL;
 
 	/* No game list */
@@ -386,6 +441,7 @@ void Menu_Config(void)
 	/* Show game info */
 	printf("[+] Info/Status for:\n\n");
 	__Menu_PrintInfo(header);
+	printf("\n\n");
 	
 	printf("    Have DVD box cover? ... ");
 
@@ -520,7 +576,7 @@ format:
 	printf("    Partition #%d\n",                  selected + 1);
 	printf("    (size = %.2fg - type: %02X)\n\n", entry->size * (sector_size / GB_SIZE), entry->type);
 
-	printf("    Press A button to continue.\n");
+	printf("    Press A button to FORMAT partition.\n");
 	printf("    Press B button to go back.\n\n\n");
 
 	/* Wait for user answer */
@@ -571,6 +627,8 @@ void Menu_Auto(void)
 		Menu_Device();
 	}
 
+	//printf("    Found!");
+	
 	/* Try to open device */
 	if (WBFS_Open() < 0) {
 		printf("    USB/WBFS Found, but failed to open...\n\n");
@@ -580,14 +638,13 @@ void Menu_Auto(void)
 	}
 
 	/* Get game list */
-	printf("    USB/WBFS Found!\n");
-	printf("    Please wait while games load...\n");
 	__Menu_GetEntries();
 }
 
 
 void Menu_Device(void)
 {
+	scrollFlag = true;
 	u32 timeout = DEVICE_TIMEOUT;
 	s32 ret;
 
@@ -800,6 +857,7 @@ void Menu_Remove(void)
 
 	/* Show game info */
 	__Menu_PrintInfo(header);
+	printf("\n\n");
 
 	printf("    Press A button to continue.\n");
 	printf("    Press B button to go back.\n\n\n");

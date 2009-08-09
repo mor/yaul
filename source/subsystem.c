@@ -8,6 +8,8 @@
 #include "config.h"
 #include "restart.h"
 #include "net.h"
+#include "disc.h"
+#include "wdvd.h"
 
 void Subsystem_Init(u8 method)
 {
@@ -63,20 +65,31 @@ void Subsystem_Init(u8 method)
 		} else
 			if (method == VERBOSE) printf("OK!\n");
 	}
-	
-	/* Initialize Network */
-	if (method == VERBOSE) printf("    Initializing Newtwork: ");
-	Net_Init();
-	if (!Net_IsRunning()) {
-		if (method == VERBOSE) {
-			printf("FAIL\n");
-			printf("    * Unable to download covers.\n\n");
-		}
+
+        if (method == VERBOSE) printf("    Initializing Wii DVD: ");
+        s32 ret;
+	ret = Disc_Init();
+	if (ret < 0) {
+		if (method == VERBOSE) printf("FAIL\n");
+		if (method == VERBOSE) printf("    * Unable to install from DVD.\n\n");
 	} else
 		if (method == VERBOSE) printf("OK!\n\n");
+
 	
+	///* Initialize Network */
+	//if (method == VERBOSE) printf("    Initializing Newtwork: ");
+	//Net_Init();
+	///* Network Init never returns if it fails, so we don't check anything.
+	//   if we got this far, it must have initialized... */	
+	//if (method == VERBOSE) printf("OK!\n\n");
+
+	///* Pre-cache IPs of needed hostnames */
+	//Net_GetIP(COVER_HOST_1);
+	//Net_GetIP(COVER_HOST_2);
+	//Net_GetIP(COVER_HOST_3);
+	//Net_GetIP(UPDATE_HOST);
+
 	if (method == VERBOSE) printf("[+] Subsystems Initialized\n\n");
-	                
 }
 
 void Subsystem_Close(void)
@@ -86,5 +99,7 @@ void Subsystem_Close(void)
 
 	/* Unmount SDHC */
 	Fat_UnmountSDHC();
-	
+
+	/* Shutdown DVD */
+	WDVD_Close();	
 }

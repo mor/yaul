@@ -10,6 +10,8 @@
 #include "video.h"
 #include "wbfs.h"
 #include "wdvd.h"
+#include "sys.h"
+#include "restart.h"
 
 #include "libwbfs/libwbfs.h"
 
@@ -236,7 +238,9 @@ s32 WBFS_Init(u32 device, u32 timeout)
 		return -1;
 
 	/* Try to mount device */
+	printf("    Init attempt: ");
 	for (cnt = 0; cnt < timeout; cnt++) {
+		printf("%d ", cnt + 1);
 		switch (device) {
 		case WBFS_DEVICE_USB:
 			/* Initialize USB storage */
@@ -253,11 +257,18 @@ s32 WBFS_Init(u32 device, u32 timeout)
 				goto out;
 			}else{
 				ret = -1;
+				//printf("%1 ", cnt);
 				Subsystem_Close();
-				WDVD_Close();
+				//WDVD_Close();
 				ret = IOS_ReloadIOS(249);  //IOS must reload before USB can be retried
+				if (ret < 0) {
+					printf("[+] ERROR re-loading cIOS!\n\n");
+					printf("    Sorry, have to exit...\n");
+					sleep(3);
+					Restart();
+				}
 				Subsystem_Init(QUIET);
-				WDVD_Init();
+				//WDVD_Init();
 			}
 			break;
 
@@ -276,13 +287,19 @@ s32 WBFS_Init(u32 device, u32 timeout)
 
 				goto out;
 			} else{
-                                ret = -1;
-                                Subsystem_Close();
-				WDVD_Close();
-                                ret = IOS_ReloadIOS(249);  //IOS must reload before SD can be retried
-                                Subsystem_Init(QUIET);
-				WDVD_Init();
-                        }
+				ret = -1;
+				Subsystem_Close();
+				//WDVD_Close();
+				ret = IOS_ReloadIOS(249);  //IOS must reload before SD can be retried
+				if (ret < 0) {       
+                                        printf("[+] ERROR re-loading cIOS!\n\n");
+                                        printf("    Sorry, have to exit...\n");
+                                        sleep(3);
+                                        Restart();
+                                }
+				Subsystem_Init(QUIET);
+				//WDVD_Init();
+			}
 			break;
 
 		default:
