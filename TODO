@@ -1,0 +1,8 @@
+- new screen gfx
+- HBC style install pieces
+- write INSTALL doc
+- file renaming
+- video/region patching
+- savegame/cheat support
+- file/image verify
+- network import/export
