@@ -10,7 +10,7 @@
 #define COVER_XCOORD 24
 #define COVER_YCOORD 104
 #define COVER_WIDTH 160
-#define COVER_HEIGHT 224
+#define COVER_HEIGHT 225
 
 #define BACKGROUND_WIDTH 640
 #define BACKGROUND_HEIGHT 480
@@ -38,7 +38,7 @@
 #define COVER_HOST_3_3D_PATH "/3dBoxArt176x248/%s.png"
  
 #define UPDATE_HOST "saratoga.ath.cx"
-#define UPDATE_DOL_PATH "/latest_version/yaul.dol"
+#define UPDATE_DOL_PATH "/latest_version/boot.dol"
 #define UPDATE_XML_PATH "/latest_version/meta.xml"
 #define UPDATE_PNG_PATH "/latest_version/icon.png"
 
