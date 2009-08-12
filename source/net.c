@@ -288,14 +288,6 @@ struct block Net_GetFile(char * host, char * path)
 	for (i = 8 ; i < 15 ; i++) {
 		if (response.data[i] != status_line[i]) {
 			status_200 = false;
-			int j;
-			printf("\nresponse.data: ");
-			for (j = 8 ; j < 15 ; j++)
-				printf("%c", response.data[j]);
-			printf("\nstatus_line: ");
-			for (j = 8 ; j < 15 ; j++)
-				printf("%c", status_line[j]);
-
 			break;
 		}
 	}

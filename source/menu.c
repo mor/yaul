@@ -99,8 +99,8 @@ err:
 }
 
 
-void Menu_CoverFetch(void) {
-	
+void Menu_CoverFetch(void)
+{	
 	Con_Clear();
 
 	u16 coverCnt = 0, cnt;	
@@ -116,7 +116,7 @@ void Menu_CoverFetch(void) {
 		printf("    Press any button...\n");
 		Wpad_WaitButtons();
 	} else {
-		printf("    Press A to download missing %d covers.\n", gameCnt - coverCnt);
+		printf("    Press A to download %d missing covers.\n", gameCnt - coverCnt);
 		printf("    Press B to skip cover downloading.\n\n");
 
                 /* Wait for user answer */
@@ -140,7 +140,7 @@ void Menu_CoverFetch(void) {
 					}
 				}
 				printf("    Cover download complete.\n\n");
-				printf("    Press any button...");
+				printf("    Press any button...\n");
 				Wpad_WaitButtons();
                                 break;
                         }
@@ -414,35 +414,38 @@ void Menu_Update(void)
 
 	printf("      Latest yaul release: %s\n\n", version);
 	
-	if (strcmp(_YAUL_VERSION_, version) == 0)
+	if (strcmp(_YAUL_VERSION_, version) == 0) {
 		printf("    You have the latest version.\n\n");
+		printf("    Press A to Re-install it.\n");
+	}
 	else {
 		printf("    An upgrade is available.\n\n");
 		printf("    Press A to Upgrade yaul\n");
-		printf("    Press B to Cancel\n\n");
+	}
+	
+	printf("    Press B to Cancel.\n\n");
+	
+	/* Wait for user answer */
+	for (;;) {
+		u32 buttons = Wpad_WaitButtons();
 
-		/* Wait for user answer */
-		for (;;) {
-			u32 buttons = Wpad_WaitButtons();
-
-			/* A button */
-			if (buttons & WPAD_BUTTON_A) {
-				s32 ret;
-				ret = Update_Fetch();
-				if (ret == -1)
-					printf("    UPDATE FAILED!\n\n");
-				else {
-					printf("    Update Succeeded!\n");
-					printf("    You need to restart...\n\n");
-					Restart_Wait();
-				}
-				break;
+		/* A button */
+		if (buttons & WPAD_BUTTON_A) {
+			s32 ret;
+			ret = Update_Fetch();
+			if (ret == -1)
+				printf("    UPDATE FAILED!\n\n");
+			else {
+				printf("    Update Succeeded! You need to restart.\n");
+				Restart_Wait();
 			}
+			break;
+		}
 
-			/* B button */
-			if (buttons & WPAD_BUTTON_B)
-				cancel = true;
-				break;
+		/* B button */
+		if (buttons & WPAD_BUTTON_B) {
+			cancel = true;
+			break;
 		}
 	}
 

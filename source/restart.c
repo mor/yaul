@@ -25,7 +25,7 @@ void Restart_Wait(void)
 {
 	printf("\n");
 
-	printf("    Press any button to restart...");
+	printf("    Press any button...");
 	fflush(stdout);
 
 	/* Wait for button */
