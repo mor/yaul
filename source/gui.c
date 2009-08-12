@@ -145,3 +145,12 @@ void Gui_DrawCover(u8 *discid)
 	if (imgData != coverImg)
 		free(imgData);
 }
+
+void Gui_DrawTitle(void)
+{
+	extern char titleImg[];
+
+        void *imgData = (void *)titleImg;
+
+	__Gui_DrawPng(imgData, COVER_XCOORD, COVER_YCOORD);
+}

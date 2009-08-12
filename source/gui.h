@@ -5,5 +5,6 @@
 void Gui_InitConsole(void);
 void Gui_DrawBackground(void);
 void Gui_DrawCover(u8 *);
+void Gui_DrawTitle(void);
 
 #endif

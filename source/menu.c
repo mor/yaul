@@ -31,7 +31,7 @@ static struct discHdr *gameList = NULL;
 /* Gamelist variables */
 static s32 gameCnt = 0, gameSelected = 0, gameStart = 0, selectedCnt = 0;
 
-static bool scrollFlag = true;
+static bool listRefresh = true;
 
 /* WBFS device */
 static s32 wbfsDev = WBFS_MIN_DEVICE;
@@ -100,8 +100,6 @@ err:
 
 
 void Menu_CoverFetch(void) {
-	
-	scrollFlag = true;
 	
 	Con_Clear();
 
@@ -212,15 +210,15 @@ void __Menu_MoveList(s8 delta)
 
 	if (index >= ENTRIES_PER_PAGE) {
 		gameStart += index - (ENTRIES_PER_PAGE - 1);
-		scrollFlag = true;
+		listRefresh = true;
 	}
 
 	if (index <= -1) {
 		gameStart += index;
-		scrollFlag = true;
+		listRefresh = true;
 	}
 
-	if (!scrollFlag && (delta == 1 || delta == -1) ) {
+	if (!listRefresh && (delta == 1 || delta == -1) ) {
 	        /* Move to previously 'selected' row */
         	printf("\x1b[u");
         	fflush(stdout);
@@ -299,7 +297,7 @@ void __Menu_ShowList(void)
 	/* Print free/used space */
 	printf("\n[+] Free: %.2fg  Used: %.2fg\n\n", free, used);
 	
-	scrollFlag = false;
+	listRefresh = false;
 }
 
 void __Menu_ShowCover(void)
@@ -350,20 +348,26 @@ void __Menu_Controls(void)
 
 		/* PLUS (+) button */
 		if (buttons & WPAD_BUTTON_PLUS) {
+			Gui_DrawTitle();
 			Menu_Install();
+			listRefresh = true;
 			break;
 		}
 
 		/* MINUS (-) button */
 		if (buttons & WPAD_BUTTON_MINUS) {
+			Gui_DrawTitle();
 			Menu_Remove();
+			listRefresh = true;
 			break;
 		}
 
 		/* ONE (1) button */
 		if (buttons & WPAD_BUTTON_1) {
+			Gui_DrawTitle();
 			USBStorage_Deinit();
 			Menu_Device();
+			listRefresh = true;
 			break;
 		}
 
@@ -374,12 +378,15 @@ void __Menu_Controls(void)
 		}
 		if (buttons & WPAD_BUTTON_B) {
 			Menu_Config();
+			listRefresh = true;
 			break;
 		}
 		
 		if (buttons & WPAD_BUTTON_2) {
+			Gui_DrawTitle();
 			Menu_CoverFetch();
 			Menu_Update();
+			listRefresh = true;
 			break;
 		}
 	}
@@ -387,50 +394,64 @@ void __Menu_Controls(void)
 
 void Menu_Update(void)
 {
-	scrollFlag = true;
-
+	bool cancel = false;
+	
 	Con_Clear();
 
 	printf("[+] Current installed version: %s\n", _YAUL_VERSION_);
 
 	struct block latest_version;
 	Update_CheckVersion(latest_version);
-
-	printf("[+]  Latest version available: %s\n\n", latest_version.data);
-
-	printf("    Press A to Update\n");
-	printf("    Press B to Cancel\n\n");
+	char version[7];
+	memset(version, 0, 7);
 	
-	/* Wait for user answer */
-	for (;;) {
-		u32 buttons = Wpad_WaitButtons();
- 
-		/* A button */
-		if (buttons & WPAD_BUTTON_A) {
-			s32 ret;
-			ret = Update_Fetch();
-			if (ret == -1)
-				printf("    UPDATE FAILED!\n\n");
-			else {
-				printf("    Update Succeeded!\n\n");
-				printf("    You need to restart...\n\n");
-				Restart_Wait();
-			}
-			break;
-		}
+	int i;
+	for (i = 1; i < latest_version.size - 1 ; i++)
+		version[i] = latest_version.data[i];
 
-		/* B button */
-		if (buttons & WPAD_BUTTON_B)
-			break;
+	printf("[+]  Latest version available: %s\n\n", version);
+	
+	if (strcmp(_YAUL_VERSION_, version) == 0)
+		printf("    You have the latest version.\n\n");
+	else {
+		printf("    An upgrade is available.\n\n");
+		printf("    Press A to Update\n");
+		printf("    Press B to Cancel\n\n");
+
+		/* Wait for user answer */
+		for (;;) {
+			u32 buttons = Wpad_WaitButtons();
+
+			/* A button */
+			if (buttons & WPAD_BUTTON_A) {
+				s32 ret;
+				ret = Update_Fetch();
+				if (ret == -1)
+					printf("    UPDATE FAILED!\n\n");
+				else {
+					printf("    Update Succeeded!\n\n");
+					printf("    You need to restart...\n\n");
+					Restart_Wait();
+				}
+				break;
+			}
+
+			/* B button */
+			if (buttons & WPAD_BUTTON_B)
+				cancel = true;
+				break;
+		}
 	}
-	printf("    Press any button...\n");
-	scrollFlag = true;
-	Wpad_WaitButtons();
+
+	if (!cancel) {
+		printf("    Press any button...\n");
+		Wpad_WaitButtons();
+	}
 }
 	
 void Menu_Config(void)
 {
-	scrollFlag = true;
+	listRefresh = true;
 	
 	struct discHdr *header = NULL;
 
@@ -650,7 +671,7 @@ void Menu_Auto(void)
 
 void Menu_Device(void)
 {
-	scrollFlag = true;
+	listRefresh = true;
 	u32 timeout = DEVICE_TIMEOUT;
 	s32 ret;
 
@@ -973,6 +994,7 @@ void Menu_Loop(void)
 {
 	/* Device menu */
 	//Menu_Device();
+	Gui_DrawTitle();
 	Menu_Auto();
 	
 	/* Menu loop */
@@ -981,7 +1003,7 @@ void Menu_Loop(void)
 		//Con_Clear();
 
 		/* Show gamelist */
-		if (scrollFlag) {
+		if (listRefresh) {
 			Con_Clear();
 			__Menu_ShowList();
 		}
