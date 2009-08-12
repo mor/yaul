@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <app version="0.1">
-	<name>'Yet Another USB Loader'</name>
-	<version>0.1</version>
+	<name>'yaul'</name>
+	<version>0.1.1</version>
         <release_date>20090809</release_date>
 	<coder>xmor61</coder>
 	<short_description>Yet Another USB Loader</short_description>

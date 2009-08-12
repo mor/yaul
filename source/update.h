@@ -4,6 +4,6 @@
 #include "net.h"
 
 s32 Update_Fetch(void);
-void Update_CheckVersion(struct block version);
+struct block Update_CheckVersion(void);
 
 #endif

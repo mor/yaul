@@ -277,7 +277,7 @@ struct block Net_GetFile(char * host, char * path)
 
 	//printf("RECV: %d bytes\n\n", response.size);
 	
-	if (response.size < 20) {
+	if (response.size < 15) {
 		return emptyblock;
 	}
 
@@ -344,6 +344,6 @@ struct block Net_GetFile(char * host, char * path)
 
 	/* Dispose of download buffer */
 	free(response.data);
-
+	
 	return file;
 }

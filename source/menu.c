@@ -398,24 +398,27 @@ void Menu_Update(void)
 	
 	Con_Clear();
 
-	printf("[+] Current installed version: %s\n", _YAUL_VERSION_);
+	printf("[+] Checking for yaul upgrades...\n\n");
+	
+	printf("    Your currrent version: %s\n", _YAUL_VERSION_);
 
 	struct block latest_version;
-	Update_CheckVersion(latest_version);
-	char version[7];
-	memset(version, 0, 7);
-	
+	latest_version = Update_CheckVersion();
+	//printf("    downloaded VERSION size: %u\n\n", latest_version.size);
+	char version[9];
+	memset(version, 0, 9);
+
 	int i;
 	for (i = 1; i < latest_version.size - 1 ; i++)
-		version[i] = latest_version.data[i];
+		version[i - 1] = latest_version.data[i];
 
-	printf("[+]  Latest version available: %s\n\n", version);
+	printf("      Latest yaul release: %s\n\n", version);
 	
 	if (strcmp(_YAUL_VERSION_, version) == 0)
 		printf("    You have the latest version.\n\n");
 	else {
 		printf("    An upgrade is available.\n\n");
-		printf("    Press A to Update\n");
+		printf("    Press A to Upgrade yaul\n");
 		printf("    Press B to Cancel\n\n");
 
 		/* Wait for user answer */
@@ -429,7 +432,7 @@ void Menu_Update(void)
 				if (ret == -1)
 					printf("    UPDATE FAILED!\n\n");
 				else {
-					printf("    Update Succeeded!\n\n");
+					printf("    Update Succeeded!\n");
 					printf("    You need to restart...\n\n");
 					Restart_Wait();
 				}
@@ -444,15 +447,13 @@ void Menu_Update(void)
 	}
 
 	if (!cancel) {
-		printf("    Press any button...\n");
+		printf("    Press any button...");
 		Wpad_WaitButtons();
 	}
 }
 	
 void Menu_Config(void)
 {
-	listRefresh = true;
-	
 	struct discHdr *header = NULL;
 
 	/* No game list */
@@ -671,7 +672,6 @@ void Menu_Auto(void)
 
 void Menu_Device(void)
 {
-	listRefresh = true;
 	u32 timeout = DEVICE_TIMEOUT;
 	s32 ret;
 
