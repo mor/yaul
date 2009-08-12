@@ -105,7 +105,7 @@ out:
 s32 Fat_WriteFile(const char *filepath, struct block buffer)
 {
 	FILE *fp = NULL;
-	u32 filelen = buffer.size;
+	//u32 filelen = buffer.size;
 
 	s32 ret;
 
@@ -115,8 +115,8 @@ s32 Fat_WriteFile(const char *filepath, struct block buffer)
 		goto err;
 
 	/* Read file */
-	ret = fwrite(buffer.data, 1, filelen, fp);
-	if (ret != filelen)
+	ret = fwrite(buffer.data, 1, buffer.size, fp);
+	if (ret != buffer.size)
 		goto err;
 
 	goto out;

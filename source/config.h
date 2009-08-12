@@ -41,6 +41,7 @@
 #define UPDATE_DOL_PATH "/latest_version/boot.dol"
 #define UPDATE_XML_PATH "/latest_version/meta.xml"
 #define UPDATE_PNG_PATH "/latest_version/icon.png"
+#define UPDATE_VER_PATH "/LATEST_VERSION"
 
 #define DOL_FILE "sdhc:/apps/yaul/boot.dol"
 #define XML_FILE "sdhc:/apps/yaul/meta.xml"

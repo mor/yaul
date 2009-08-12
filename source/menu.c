@@ -119,7 +119,7 @@ void Menu_CoverFetch(void) {
 		Wpad_WaitButtons();
 	} else {
 		printf("    Press A to download missing %d covers.\n", gameCnt - coverCnt);
-		printf("    Press B to skip cover downloading.\n");
+		printf("    Press B to skip cover downloading.\n\n");
 
                 /* Wait for user answer */
                 for (;;) {
@@ -390,10 +390,16 @@ void Menu_Update(void)
 	scrollFlag = true;
 
 	Con_Clear();
-	
-	printf("[+] Check for System Update\n\n");
+
+	printf("[+] Current installed version: %s\n", _YAUL_VERSION_);
+
+	struct block latest_version;
+	Update_CheckVersion(latest_version);
+
+	printf("[+]  Latest version available: %s\n\n", latest_version.data);
+
 	printf("    Press A to Update\n");
-	printf("    Press B to Cancel\n");
+	printf("    Press B to Cancel\n\n");
 	
 	/* Wait for user answer */
 	for (;;) {
@@ -407,7 +413,7 @@ void Menu_Update(void)
 				printf("    UPDATE FAILED!\n\n");
 			else {
 				printf("    Update Succeeded!\n\n");
-				printf("    You need to restart...\n");
+				printf("    You need to restart...\n\n");
 				Restart_Wait();
 			}
 			break;

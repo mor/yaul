@@ -21,12 +21,13 @@ BUILD		:=	build
 SOURCES		:=	source source/libpng/pngu source/libwbfs source/network
 DATA		:=	data  
 INCLUDES	:=
+VERSION         :=	`cat ../VERSION`
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
 
-CFLAGS	= -Os -Wall $(MACHDEP) $(INCLUDE)
+CFLAGS	= -Os -Wall $(MACHDEP) $(INCLUDE) -D_YAUL_VERSION_=$(VERSION)
 CXXFLAGS	=	$(CFLAGS)
 
 LDFLAGS	=	$(MACHDEP) -Wl,-Map,$(notdir $@).map,--section-start,.init=0x80a00100

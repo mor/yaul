@@ -43,3 +43,18 @@ s32 Update_Fetch() {
 	
 	return ret;
 }
+
+void Update_CheckVersion(struct block version)
+{
+	char host[64];
+	strcpy(host, UPDATE_HOST);
+	char ver_path[100];
+	strcpy(ver_path, UPDATE_VER_PATH);
+	
+	struct block ver_file;
+	
+	ver_file = Net_GetFile(host, ver_path);
+	if (ver_file.size > 0)
+		memcpy(version.data, ver_file.data, ver_file.size);
+	free(ver_file.data);
+}
