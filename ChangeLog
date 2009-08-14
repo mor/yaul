@@ -1,7 +1,6 @@
+[+] yaul v0.1, August 9, 2009:
 
-[+] yaul version 0.1, August 9, 2009:
-
-	* yaul 0.1 is the first official release
+	* yaul v0.1 is the first official release
 
 	* changees from SD/USB Loader ver. 1.5:
 
@@ -13,39 +12,40 @@
 
 		- Assorted UI tweaks:
 		  
-		  a) use reverse video scroll bar on game select menu
-		  b) games launch immediately, without secodary, "are
+		  a) use reverse video scroll bar on game select menu;
+		  b) games launch immediately, without secondary, "are
 		     you sure" prompt;
-		  c) game sizes displayed on game select menu
+		  c) game sizes displayed on game select menu;
 		  d) game menu scrolls a bit faster by not updating
 		     the display every button push, but only when
-		     the screen needs tot scroll
+		     the screen needs tot scroll;
 
 		- Automatically try to mount a USB drive, and only go
-		  to device selection menu after that fails (or if the
+		  to device selection menu if that fails (or if the
 		  user selects it by pressing '1' on the Wiimote).
 
 		- Change startup screens to display initialization
 		  sequence/status.
 
-		- Add networking.  Implement downloads of covers and
-		  software updates on a menu accessible by pressing
-		  '2' on the Wiimote.  [Integrate some code snippets
-		  from ftpii and USB Loader GX.]
+		- Add networking.  Implement downloads of game box 
+		  covers and software updates on a menu accessible by
+		  pressing '2' on the Wiimote.  [Integrate some code
+		  snippets from ftpii and USB Loader GX.]
 
 		- Implement IOS_reload() on device selection menu to
 		  allow for device changing/swapping.
 
-		- Exit game straight back to HBC (or other loader),
+		- Exit from youl straight back to HBC (or other loader),
 		  instead of all the way to Wii menu.
 
 		- Assorted re-organizing of source code:
+
 		  a) added a config.h to store some general application
 		     settings.
 		  b) added cover.c and cover.h for cover downloads.
 		  c) added update.c and update.h for network updates.
 		  d) added net.c and net.h for all network activity.
 		  e) expand menu.c and subsystem.c extensively.
-		
 
-[+] Initial form from SD/USB Loader, July 30, 2009
+
+[+] Initial fork from SD/USB Loader, July 30, 2009
