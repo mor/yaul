@@ -404,6 +404,11 @@ void Menu_Update(void)
 
 	struct block latest_version;
 	latest_version = Update_CheckVersion();
+	if (latest_version.data == NULL) {
+		printf("    Error, unable to connect to yaul\n    update server.  Try again later.\n\n");
+		goto err;
+	}
+		
 	//printf("    downloaded VERSION size: %u\n\n", latest_version.size);
 	char version[9];
 	memset(version, 0, 9);
@@ -449,6 +454,7 @@ void Menu_Update(void)
 		}
 	}
 
+err:
 	if (!cancel) {
 		printf("    Press any button...");
 		Wpad_WaitButtons();
