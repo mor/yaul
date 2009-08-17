@@ -63,6 +63,7 @@ void __Disc_SetVMode(void)
 		break;
 
 	case CONF_VIDEO_NTSC:
+		vmode     = (progressive) ? &TVNtsc480Prog : &TVNtsc480IntDf;
 		vmode_reg = 0;
 		break;
 	}

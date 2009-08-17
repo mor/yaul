@@ -55,8 +55,8 @@ s32 Apploader_Run(entry_point *entry)
 	u32 appldr_len;
 	s32 ret;
 
-	u8 ios_revision;
-	ios_revision = IOS_GetRevision();
+	//u8 ios_revision;
+	//ios_revision = IOS_GetRevision();
 	
 	/* Read apploader header */
 	ret = WDVD_Read(buffer, 0x20, APPLDR_OFFSET);
@@ -100,6 +100,7 @@ s32 Apploader_Run(entry_point *entry)
 		//if (ios_revision < 12 || ios_revision > 13)
 		Apply_Anti_002_fix(dst, len);
 		//printf("    Anti_002 fix applied...\n");
+		
 	}
 
 	/* Set entry point from apploader */
