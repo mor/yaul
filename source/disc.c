@@ -52,7 +52,7 @@ void __Disc_SetVMode(void)
 	case CONF_VIDEO_PAL:
 		if (CONF_GetEuRGB60() > 0) {
 			vmode_reg = 5;
-			vmode     = (progressive) ? &TVNtsc480Prog : &TVEurgb60Hz480IntDf;
+			vmode = (progressive) ? &TVNtsc480Prog : &TVEurgb60Hz480IntDf;
 		} else
 			vmode_reg = 1;
 
@@ -63,36 +63,37 @@ void __Disc_SetVMode(void)
 		break;
 
 	case CONF_VIDEO_NTSC:
-		vmode     = (progressive) ? &TVNtsc480Prog : &TVNtsc480IntDf;
 		vmode_reg = 0;
+		vmode = (progressive) ? &TVNtsc480Prog : &TVNtsc480IntDf;    
 		break;
 	}
 
-	/* Select video mode */
-	switch(diskid[3]) {
-	/* PAL */
-	case 'D':
-	case 'F':
-	case 'P':
-	case 'X':
-	case 'Y':
-		if (tvmode != CONF_VIDEO_PAL) {
-			vmode_reg = 1;
-			vmode     = (progressive) ? &TVNtsc480Prog : &TVNtsc480IntDf;
-		}
+	/* DON'T CARE WHAT VIDEO MODE GAME WANTS, ALWAYS JUST USE THE MODE
+	   THE WII IS CURRENTLY IN BY DEFAULT */
 
-		break;
+	///* Select video mode */
+	//switch(diskid[3]) {
+	///* PAL */
+	//case 'D':
+	//case 'F':
+	//case 'P':
+	//case 'X':
+	//case 'Y':
+	//	if (tvmode != CONF_VIDEO_PAL)
+	//		vmode     = (progressive) ? &TVNtsc480Prog : &TVNtsc480IntDf;
 
-	/* NTSC or unknown */
-	case 'E':
-	case 'J':
-		if (tvmode != CONF_VIDEO_NTSC) {
-			vmode_reg = 0;
-			vmode     = (progressive) ? &TVNtsc480Prog : &TVEurgb60Hz480IntDf;
-		}
+	//	break;
 
-		break;
-	}
+	///* NTSC or unknown */
+	//case 'E':
+	//case 'J':
+	//	if (tvmode != CONF_VIDEO_NTSC) {
+	//		//vmode_reg = 0;
+	//		vmode     = (progressive) ? &TVNtsc480Prog : &TVEurgb60Hz480IntDf;
+	//	}
+
+	//	break;
+	//}
 
 	/* Set video mode register */
 	*(vu32 *)0x800000CC = vmode_reg;
