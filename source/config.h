@@ -2,13 +2,13 @@
 #define _CONFIG_H_
 
 /* Application Constants */
-#define CONSOLE_XCOORD 258
-#define CONSOLE_YCOORD 112
+#define CONSOLE_XCOORD 258 // 250 + 354 = 604 + 16 = 620
+#define CONSOLE_YCOORD 112 // 104 + 304 = 408 + 16 = 424
 #define CONSOLE_WIDTH 354
 #define CONSOLE_HEIGHT 304
 
-#define COVER_XCOORD 24
-#define COVER_YCOORD 104
+#define COVER_XCOORD 24  //  20 + 160 = 180 + 8 = 188
+#define COVER_YCOORD 104 // 104 + 224 = 328 + 8 = 336
 #define COVER_WIDTH 160
 #define COVER_HEIGHT 224
 

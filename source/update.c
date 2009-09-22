@@ -1,6 +1,7 @@
 #include "update.h"
 #include "fat.h"
 #include "config.h"
+#include "md4.h"
 
 s32 Update_Fetch() {
 
@@ -21,7 +22,13 @@ s32 Update_Fetch() {
 		if (ret != -1)  
 			ret = 0;
 	}
-	
+
+	char resbuf[17];
+	memset(resbuf, 0, 17);
+	md4_buffer(update_file.data, update_file.size, resbuf);
+	//char * hexed = my_sum(update_file);
+	//printf("    recvd file md4: %s\n", hexed);
+
 	strcpy(path, UPDATE_XML_PATH);
 	strcpy(target, XML_FILE);
 	
@@ -54,4 +61,35 @@ struct block Update_CheckVersion(void)
 	struct block version;
 	version = Net_GetFile(host, ver_path);
 	return version;
+}
+
+void hexify(char * in_str, char * out_str) {
+	const char * hex = "0123456789ABCDEF\0";
+	
+	int i;
+	for (i = 0 ; i < strlen(in_str) ; i++) {
+		char char1 = hex[in_str[i] >> 4];
+		char char2 = hex[in_str[i] & 0x0000FFFF];
+		strncat(out_str, &char1, 1);
+		strncat(out_str, &char2, 1);
+	}
+}
+
+char * my_sum(struct block buffer) {
+	const char * hex = "0123456789ABCDEF";
+	u32 i;
+	u64 sum = 0, slice = 0;
+	for (i = 0 ; i < buffer.size ; i++)
+		sum += buffer.data[i];
+	slice = sum;
+	char * output = 0;
+	for (i = 0 ; i < 16 ; i++) {
+		u64 temp = 0;
+		temp = slice & 0xF;
+		//temp = temp >> 60;
+		char nybble = hex[temp];
+		slice = slice >> 4;
+		strncat(output, &nybble, 1);
+	}
+	return output;
 }
