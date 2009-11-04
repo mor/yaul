@@ -148,9 +148,9 @@ void Gui_DrawCover(u8 *discid)
 
 void Gui_DrawTitle(void)
 {
-	extern char titleImg[];
+	extern char coverImg[];
 
-        void *imgData = (void *)titleImg;
+        void *imgData = (void *)coverImg;
 
 	__Gui_DrawPng(imgData, COVER_XCOORD, COVER_YCOORD);
 }
