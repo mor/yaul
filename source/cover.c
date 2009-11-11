@@ -39,21 +39,21 @@ s32 Cover_Fetch(u8 * discid) {
 	memset(host, 0, 64);
 	strcpy(host, COVER_HOST_1);
 	sprintf(path,  COVER_HOST_1_2D_PATH, discid);
-	printf("trying: %s %s", host, path);
+	//printf("trying: %s %s", host, path);
 	 
 	ret = __Cover_FetchURL(host, path, discid);
 	if (ret <= 0) {
 		//printf("%d ", ret);
 		strcpy(host, COVER_HOST_2);
 		sprintf(path,  COVER_HOST_2_2D_PATH, discid);
-		printf("trying: %s %s", host, path);
+		//printf("trying: %s %s", host, path);
 		
 		ret = __Cover_FetchURL(host, path, discid);
 		if (ret <= 0) {
 			//printf("%d ", ret);
 			strcpy(host, COVER_HOST_3);
 			sprintf(path,  COVER_HOST_3_2D_PATH, discid);
-			printf("trying: %s %s", host, path);
+			//printf("trying: %s %s", host, path);
 			ret = __Cover_FetchURL(host, path, discid);
 			//if (ret <= 0)
 				//printf("%d ", ret);
