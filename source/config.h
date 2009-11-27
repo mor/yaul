@@ -10,7 +10,7 @@
 #define COVER_XCOORD 24  //  20 + 160 = 180 + 8 = 188
 #define COVER_YCOORD 104 // 104 + 224 = 328 + 8 = 336
 #define COVER_WIDTH 160
-#define COVER_HEIGHT 224
+#define COVER_HEIGHT 225
 
 #define BACKGROUND_WIDTH 640
 #define BACKGROUND_HEIGHT 480
@@ -23,7 +23,7 @@
 #define DATA_PATH "sdhc:/usb-loader"
 #define COVERS_PATH DATA_PATH "/covers"
 
-// Allow for three different cover file hosts on the internet
+// Allow for different cover file hosts on the internet
 //  in the 2D and 3D PATH strings, %s get replaced with header->id
 #define COVER_HOST_1 "wiicover.gateflorida.com"
 #define COVER_HOST_1_2D_PATH "/sites/default/files/cover/2D%%20Cover/%s.png"
@@ -36,7 +36,15 @@
 #define COVER_HOST_3 "awiibit.com"
 #define COVER_HOST_3_2D_PATH "/BoxArt160x224/%s.png"
 #define COVER_HOST_3_3D_PATH "/3dBoxArt176x248/%s.png"
- 
+
+#define COVER_HOST_4 "www.wiiboxart.com"
+#define COVER_HOST_4_2D_PATH "/ntsc/download.php?file=%s.png"
+#define COVER_HOST_4_3D_PATH "/3d/160/225/%s.png"
+
+#define COVER_HOST_5 "www.wiiboxart.com"
+#define COVER_HOST_5_2D_PATH "/pal/download.php?file=%s.png"
+#define COVER_HOST_5_3D_PATH "/3d/160/225/%s.png"
+
 #define UPDATE_HOST "saratoga.ath.cx"
 #define UPDATE_DOL_PATH "/latest_version/boot.dol"
 #define UPDATE_XML_PATH "/latest_version/meta.xml"
