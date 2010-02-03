@@ -4,6 +4,7 @@
 
 #include "apploader.h"
 #include "wdvd.h"
+#include "wpad.h"
 
 /* Apploader function pointers */
 typedef int   (*app_main)(void **dst, int *size, int *offset);
@@ -39,6 +40,28 @@ void Apply_Anti_002_fix(void *Address, int Size)
         {
                 if(memcmp(Addr, SearchPattern, sizeof(SearchPattern))==0)
                 {
+                        memcpy(Addr,PatchData,sizeof(PatchData));
+                }
+                Addr += 4;
+        }
+}
+
+
+/* New Super Mario Brow. Wii copy protection fix */
+void Apply_NSMB_Wii_fix(void *Address, int Size)
+{
+        u8 SearchPattern[12] =  { 0x94, 0x21, 0xff, 0xd0 };
+        u8 PatchData[12] =      { 0x4e, 0x80, 0x00, 0x20 };
+
+        void *Addr = Address;
+        void *Addr_end = Address+Size;
+
+        while(Addr <= Addr_end-sizeof(SearchPattern))
+        {
+                if(memcmp(Addr, SearchPattern, sizeof(SearchPattern))==0)
+                {
+                	printf("    Apply NSMB_Wii_fix!\n    Press a button.");
+                	Wpad_WaitButtons();
                         memcpy(Addr,PatchData,sizeof(PatchData));
                 }
                 Addr += 4;
@@ -83,6 +106,52 @@ s32 Apploader_Run(entry_point *entry)
  	/* Remove 002 */
 	*(u32 *)0x80003140 = *(u32 *)0x80003188;
 	//printf("    Error 002 fix applied...\n");
+
+	// *UPDATE 3* Using VKI PPF patch on the main.dol you should now be able to launch
+	// NSMB FROM DVD, cIOSCORP, USB LAUNCHER, MODCHIP, ETC. Use PPF-O-Matic to patch
+	// your Dols. What this patch does is the standard fix that I?ve posted in previous
+	// updates and changes the offset locations 0x001CED53 AND 0x001CED6B in the 
+	// main.dol from DA to 71. See Links for Wiikey 2 v1.3 firmware.
+
+	// *Update* Some USB loaders have now included the patch into their code and don?t
+	// require a patched main.dol for NSMB to run.  Such as CFG-Loader, OpenWiiFlow,
+	// etc? Also Wiikey is going to release an update in order to resolve the copy
+	// protection issue with Wiikey modchip owners, see comment. Also see my Comment
+	// about DVD launching below. DriveKey has also posted an update on there website
+	// see comments. Check the comments from Insider about the Wiikey 2 v1.3 update
+	// video, which will fix NSMB.
+
+	// *Update 2* The offset in the main.dol for hex editing the NTSC version is: 
+	// 0x001AB610 - 0x001AB613 . Change that section from 9421ffd0 to  4e800020 with
+	// your hex editor.
+
+	// So he simply patched the Value from 0x1ab750-0x1ab753 -> 4e 80 00 20 and got
+	// NSMBW booting via USB Loaders.
+
+	// Okay, then...
+	// PAL ?
+	//if ( *(u32 *)0x801ab750 == 0x94 ) {
+	//  printf("    NSMB_Wii patch applied:\n    0x801ab750 0x%x -> 0x4e", *(u32 *)0x801ab750 );
+	//  *(u32 *)0x801ab750 = 0x4e;
+	//}
+	//if ( *(u32 *)0x801ab751 == 0x21 ) *(u32 *)0x801ab751 = 0x80;
+	//if ( *(u32 *)0x801ab752 == 0xff ) *(u32 *)0x801ab752 = 0x00;
+	//if ( *(u32 *)0x801ab753 == 0xd0 ) *(u32 *)0x801ab753 = 0x20;
+
+	// NTSC = SMNE01 ?
+	//if ( *(u32 *)0x801ab610 == 0x94 ) {
+	//  printf("    NSMB_Wii patch applied:\n    0x801ab61 0x%x -> 0x4e", *(u32 *)0x801ab610 );
+	//  *(u32 *)0x801ab610 = 0x4e;
+	//}
+	//if ( *(u32 *)0x801ab611 == 0x21 ) *(u32 *)0x801ab611 = 0x80;
+	//if ( *(u32 *)0x801ab612 == 0xff ) *(u32 *)0x801ab612 = 0x00;
+	//if ( *(u32 *)0x801ab613 == 0xd0 ) *(u32 *)0x801ab613 = 0x20;
+
+	//*(u32 *)0x1ab610 = 0x4e;
+	//*(u32 *)0x1ab611 = 0x80;
+	//*(u32 *)0x1ab612 = 0x00;
+	//*(u32 *)0x1ab613 = 0x20;
+	
 	
 	for (;;) {
 		void *dst = NULL;
@@ -101,6 +170,8 @@ s32 Apploader_Run(entry_point *entry)
 		Apply_Anti_002_fix(dst, len);
 		//printf("    Anti_002 fix applied...\n");
 		
+		/* Apply NSMB_Wii copy-protection fix */
+		Apply_NSMB_Wii_fix(dst, len);
 	}
 
 	/* Set entry point from apploader */

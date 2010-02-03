@@ -37,31 +37,23 @@ s32 Cover_Fetch(u8 * discid) {
 	memset(path, 0, 128);
 	char host[64];
 	memset(host, 0, 64);
-	strcpy(host, COVER_HOST_4);
-	sprintf(path,  COVER_HOST_4_2D_PATH, discid);
-	//printf("trying: %s %s", host, path);
-	 
-	ret = __Cover_FetchURL(host, path, discid);
-	if (ret <= 0) {
-		//printf("%d ", ret);
-		memset(host, 0, 64);
-		strcpy(host, COVER_HOST_5);
-		sprintf(path,  COVER_HOST_5_2D_PATH, discid);
+	char country = (char) discid[3];
+	if (country == 'E') {
+		strcpy(host, COVER_HOST_US);
+		sprintf(path,  COVER_HOST_US_2D_PATH, discid);
 		//printf("trying: %s %s", host, path);
-		
-		ret = __Cover_FetchURL(host, path, discid);
-		if (ret <= 0) {
-			//printf("%d ", ret);
-			memset(host, 0, 64);
-			strcpy(host, COVER_HOST_1);
-			sprintf(path,  COVER_HOST_1_2D_PATH, discid);
-			//printf("trying: %s %s", host, path);
-			ret = __Cover_FetchURL(host, path, discid);
-			//if (ret <= 0)
-				//printf("%d ", ret);
-		}
 	}
-	
+	else if (country == 'P') {
+		strcpy(host, COVER_HOST_EN);
+		sprintf(path,  COVER_HOST_EN_2D_PATH, discid);
+	}
+	else if (country == 'J') {
+		strcpy(host, COVER_HOST_JA);
+		sprintf(path,  COVER_HOST_JA_2D_PATH, discid);
+	}
+	ret = __Cover_FetchURL(host, path, discid);
+	if (ret <= 0) 
+		printf("fail: %d", ret);
 	return ret;
 }
 

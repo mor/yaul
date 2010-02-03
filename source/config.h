@@ -25,17 +25,17 @@
 
 // Allow for different cover file hosts on the internet
 //  in the 2D and 3D PATH strings, %s get replaced with header->id
-#define COVER_HOST_1 "wiicover.gateflorida.com"
-#define COVER_HOST_1_2D_PATH "/sites/default/files/cover/2D%%20Cover/%s.png"
-#define COVER_HOST_1_3D_PATH "/sites/default/files/cover/3D%%20Cover/%s.png"
+#define COVER_HOST_US "wiitdb.com"
+#define COVER_HOST_US_2D_PATH "/wiitdb/artwork/cover/US/%s.png"
+#define COVER_HOST_US_3D_PATH "/sites/default/files/cover/3D%%20Cover/%s.png"
 
-#define COVER_HOST_2 "saratoga.ath.cx"
-#define COVER_HOST_2_2D_PATH "/wii_2D_cover_images/%s.png"
-#define COVER_HOST_2_3D_PATH "/wii_3D_box_images/%s.png"
+#define COVER_HOST_EN "wiitdb.com"
+#define COVER_HOST_EN_2D_PATH "/wiitdb/artwork/cover/EN/%s.png"
+#define COVER_HOST_EN_3D_PATH "/wii_3D_box_images/%s.png"
 
-#define COVER_HOST_3 "awiibit.com"
-#define COVER_HOST_3_2D_PATH "/BoxArt160x224/%s.png"
-#define COVER_HOST_3_3D_PATH "/3dBoxArt176x248/%s.png"
+#define COVER_HOST_JA "wiitdb.com"
+#define COVER_HOST_JA_2D_PATH "/wiitdb/artwork/cover/JA/%s.png"
+#define COVER_HOST_JA_3D_PATH "/3dBoxArt176x248/%s.png"
 
 #define COVER_HOST_4 "www.wiiboxart.com"
 #define COVER_HOST_4_2D_PATH "/ntsc/download.php?file=%s.png"
