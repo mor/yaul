@@ -39,21 +39,26 @@ s32 Cover_Fetch(u8 * discid) {
 	memset(host, 0, 64);
 	char country = (char) discid[3];
 	if (country == 'E') {
+	        printf("NTSC-US ");
 		strcpy(host, COVER_HOST_US);
 		sprintf(path,  COVER_HOST_US_2D_PATH, discid);
 		//printf("trying: %s %s", host, path);
 	}
 	else if (country == 'P') {
+		printf("PAL ");
 		strcpy(host, COVER_HOST_EN);
 		sprintf(path,  COVER_HOST_EN_2D_PATH, discid);
 	}
 	else if (country == 'J') {
+		printf("NTSC-JA ");
 		strcpy(host, COVER_HOST_JA);
 		sprintf(path,  COVER_HOST_JA_2D_PATH, discid);
 	}
 	ret = __Cover_FetchURL(host, path, discid);
 	if (ret <= 0) 
-		printf("fail: %d", ret);
+		printf("fail: %d\n", ret);
+	else
+		printf("success.\n");
 	return ret;
 }
 

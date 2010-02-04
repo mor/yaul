@@ -28,7 +28,7 @@ static void __noprint(const char *fmt, ...)
 }
 
 /* Anti 002 fix for IOS 249 */
-void Apply_Anti_002_fix(void *Address, int Size)
+void Apply_Anti_002_Fix(void *Address, int Size)
 {
         u8 SearchPattern[12] =  { 0x2C, 0x00, 0x00, 0x00, 0x48, 0x00, 0x02, 0x14, 0x3C, 0x60, 0x80, 0x00 };
         u8 PatchData[12] =      { 0x2C, 0x00, 0x00, 0x00, 0x40, 0x82, 0x02, 0x14, 0x3C, 0x60, 0x80, 0x00 };
@@ -47,26 +47,50 @@ void Apply_Anti_002_fix(void *Address, int Size)
 }
 
 
-/* New Super Mario Brow. Wii copy protection fix */
-void Apply_NSMB_Wii_fix(void *Address, int Size)
+/** New Super Mario Bros. Wii copy protection fix **/
+/** Thanks to WiiPower **/
+bool Apply_NSMB_Wii_Fix(void *Address, int Size)
 {
-        u8 SearchPattern[12] =  { 0x94, 0x21, 0xff, 0xd0 };
-        u8 PatchData[12] =      { 0x4e, 0x80, 0x00, 0x20 };
+	if (memcmp("SMNE", (char *)0x80000000, 4) == 0)
+	{
+		u8 SearchPattern[32] = 	{ 0x94, 0x21, 0xFF, 0xD0, 0x7C, 0x08, 0x02, 0xA6, 0x90, 0x01, 0x00, 0x34, 0x39, 0x61, 0x00, 0x30, 0x48, 0x12, 0xD7, 0x89, 0x7C, 0x7B, 0x1B, 0x78, 0x7C, 0x9C, 0x23, 0x78, 0x7C, 0xBD, 0x2B, 0x78 };
+		u8 PatchData[32] = 		{ 0x4E, 0x80, 0x00, 0x20, 0x7C, 0x08, 0x02, 0xA6, 0x90, 0x01, 0x00, 0x34, 0x39, 0x61, 0x00, 0x30, 0x48, 0x12, 0xD7, 0x89, 0x7C, 0x7B, 0x1B, 0x78, 0x7C, 0x9C, 0x23, 0x78, 0x7C, 0xBD, 0x2B, 0x78 };
 
-        void *Addr = Address;
-        void *Addr_end = Address+Size;
+		void *Addr = Address;
+		void *Addr_end = Address+Size;
 
-        while(Addr <= Addr_end-sizeof(SearchPattern))
-        {
-                if(memcmp(Addr, SearchPattern, sizeof(SearchPattern))==0)
-                {
-                	printf("    Apply NSMB_Wii_fix!\n    Press a button.");
-                	Wpad_WaitButtons();
-                        memcpy(Addr,PatchData,sizeof(PatchData));
-                }
-                Addr += 4;
-        }
+		while(Addr <= Addr_end-sizeof(SearchPattern))
+		{
+			if(memcmp(Addr, SearchPattern, sizeof(SearchPattern))==0)
+			{
+				memcpy(Addr,PatchData,sizeof(PatchData));
+				return true;
+			}
+			Addr += 4;
+		}
+	}
+	else if (memcmp("SMN", (char *)0x80000000, 3) == 0)
+	{
+		u8 SearchPattern[32] = 	{ 0x94, 0x21, 0xFF, 0xD0, 0x7C, 0x08, 0x02, 0xA6, 0x90, 0x01, 0x00, 0x34, 0x39, 0x61, 0x00, 0x30, 0x48, 0x12, 0xD9, 0x39, 0x7C, 0x7B, 0x1B, 0x78, 0x7C, 0x9C, 0x23, 0x78, 0x7C, 0xBD, 0x2B, 0x78 };
+		u8 PatchData[32] = 		{ 0x4E, 0x80, 0x00, 0x20, 0x7C, 0x08, 0x02, 0xA6, 0x90, 0x01, 0x00, 0x34, 0x39, 0x61, 0x00, 0x30, 0x48, 0x12, 0xD9, 0x39, 0x7C, 0x7B, 0x1B, 0x78, 0x7C, 0x9C, 0x23, 0x78, 0x7C, 0xBD, 0x2B, 0x78 };
+
+		void *Addr = Address;
+		void *Addr_end = Address+Size;
+
+		while(Addr <= Addr_end-sizeof(SearchPattern))
+		{
+			if(memcmp(Addr, SearchPattern, sizeof(SearchPattern))==0)
+			{
+				memcpy(Addr,PatchData,sizeof(PatchData));
+				return true;
+			}
+			Addr += 4;
+		}
+	}
+	return false;
 }
+
+
 
 s32 Apploader_Run(entry_point *entry)
 {
@@ -167,11 +191,11 @@ s32 Apploader_Run(entry_point *entry)
 
 		/* Apply Anti_002 fix as needed */
 		//if (ios_revision < 12 || ios_revision > 13)
-		Apply_Anti_002_fix(dst, len);
+		Apply_Anti_002_Fix(dst, len);
 		//printf("    Anti_002 fix applied...\n");
 		
 		/* Apply NSMB_Wii copy-protection fix */
-		Apply_NSMB_Wii_fix(dst, len);
+		Apply_NSMB_Wii_Fix(dst, len);
 	}
 
 	/* Set entry point from apploader */
